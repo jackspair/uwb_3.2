@@ -169,6 +169,10 @@ Mode *Copter::mode_from_mode_num(const Mode::Number mode)
             break;
 #endif
 
+        case Mode::Number::DRAWPICTURE:
+            ret = &mode_drawpicture;
+            break;
+
 #if MODE_TURTLE_ENABLED == ENABLED
         case Mode::Number::TURTLE:
             ret = &mode_turtle;
