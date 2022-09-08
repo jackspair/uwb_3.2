@@ -41,6 +41,8 @@ bool ModeGuided::init(bool ignore_checks)
     guided_accel_target_cmss.zero();
     send_notification = false;
 
+    wp_control_start();
+
     // clear pause state when entering guided mode
     _paused = false;
 
@@ -56,7 +58,7 @@ void ModeGuided::run()
         pause_control_run();
         return;
     }
-
+    wp_control_run();
     // call the correct auto controller
     switch (guided_mode) {
 
@@ -170,6 +172,8 @@ void ModeGuided::wp_control_start()
     // no need to check return status because terrain data is not used
     wp_nav->set_wp_destination(stopping_point, false);
 
+    wp_nav->set_wp_destination(copter.user_waypoint[copter.current_user_waypoint_num-1],false);
+
     // initialise yaw
     auto_yaw.set_mode_to_default(false);
 }
@@ -177,6 +181,14 @@ void ModeGuided::wp_control_start()
 // run guided mode's waypoint navigation controller
 void ModeGuided::wp_control_run()
 {
+    if(copter.current_user_waypoint_num>=0){
+        if(wp_nav->reached_wp_destination()){
+            copter.current_user_waypoint_num--;
+            if(copter.current_user_waypoint_num>=0){
+                wp_nav->set_wp_destination(copter.user_waypoint[copter.current_user_waypoint_num-1],false);
+            }
+        }
+    }
     // process pilot's yaw input
     float target_yaw_rate = 0;
     if (!copter.failsafe.radio && use_pilot_yaw()) {

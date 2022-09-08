@@ -59,3 +59,16 @@ void Copter::userhook_auxSwitch3(const RC_Channel::AuxSwitchPos ch_flag)
     // put your aux switch #3 handler here (CHx_OPT = 49)
 }
 #endif
+
+void Copter::save_user_waypoint()
+{
+
+    if(copter.current_user_waypoint_num <20){
+        user_waypoint[current_user_waypoint_num]=inertial_nav.get_position_neu_cm();
+        copter.current_user_waypoint_num++;
+        gcs().send_text(MAV_SEVERITY_CRITICAL,"Waypoint saved!");
+    }else{
+        gcs().send_text(MAV_SEVERITY_CRITICAL,"Too many waypoint!");
+    }
+}
+

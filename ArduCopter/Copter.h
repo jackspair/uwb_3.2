@@ -218,7 +218,13 @@ public:
     friend class ModeAutorotate;
     friend class ModeTurtle;
 
+    Vector3f user_waypoint[20];
+    int current_user_waypoint_num;
+    void save_user_waypoint();
+
     Copter(void);
+
+    
 
 private:
 
@@ -996,6 +1002,8 @@ private:
 public:
     void failsafe_check();      // failsafe.cpp
 };
+
+
 
 extern Copter copter;
 
