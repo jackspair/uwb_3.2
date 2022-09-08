@@ -246,6 +246,8 @@ public:
         SCRIPTING_6 =        305,
         SCRIPTING_7 =        306,
         SCRIPTING_8 =        307,
+
+        SAVE_USER_WP=        308,
     };
     typedef enum AUX_FUNC aux_func_t;
 

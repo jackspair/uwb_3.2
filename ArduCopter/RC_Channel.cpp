@@ -152,6 +152,12 @@ void RC_Channel_Copter::do_aux_function_change_mode(const Mode::Number mode,
 bool RC_Channel_Copter::do_aux_function(const aux_func_t ch_option, const AuxSwitchPos ch_flag)
 {
     switch(ch_option) {
+        case AUX_FUNC::SAVE_USER_WP:
+            if(ch_flag == AuxSwitchPos::HIGH){
+                copter.save_user_waypoint();
+            }
+            break;
+
         case AUX_FUNC::FLIP:
             // flip if switch is on, positive throttle and we're actually flying
             if (ch_flag == AuxSwitchPos::HIGH) {
