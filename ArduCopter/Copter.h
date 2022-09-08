@@ -217,6 +217,7 @@ public:
     friend class ModeZigZag;
     friend class ModeAutorotate;
     friend class ModeTurtle;
+    friend class ModeDrawPicture;
 
     Vector3f user_waypoint[20];
     int current_user_waypoint_num;
@@ -994,7 +995,7 @@ private:
 #if MODE_TURTLE_ENABLED == ENABLED
     ModeTurtle mode_turtle;
 #endif
-
+    ModeDrawPicture mode_drawpicture;
     // mode.cpp
     Mode *mode_from_mode_num(const Mode::Number mode);
     void exit_mode(Mode *&old_flightmode, Mode *&new_flightmode);

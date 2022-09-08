@@ -640,16 +640,17 @@ void Copter::one_hz_loop()
     adsb.set_is_flying(!ap.land_complete);
 #endif
 
-    gcs().send_text(MAV_SEVERITY_CRITICAL, "x:%f,y:%f,z:%f",
+    gcs().send_text(MAV_SEVERITY_CRITICAL, "Accel x:%f,y:%f,z:%f",
                     inertial_nav.get_velocity_neu_cms().x,
                     inertial_nav.get_velocity_neu_cms().y,
                     inertial_nav.get_velocity_neu_cms().z);
+    gcs().send_text(MAV_SEVERITY_CRITICAL,"lat:%d,lng:%d,alt:%d", 
+                    gps.location().lat,gps.location().lng,gps.location().alt);
 
-   /* gcs().send_text(MAV_SEVERITY_CRITICAL,"lat:%d,lng:%d", gps.location().lat,gps.location().lng);                
-
-
+   /*
     gcs().send_text(MAV_SEVERITY_CRITICAL,"lat:%d,lng:%d,alt:%d", gps.location().lat,gps.location().lng,gps.location().alt); 
-    AP_Notify::flags.flying = !ap.land_complete;*/
+    */
+   AP_Notify::flags.flying = !ap.land_complete;
 }
 
 void Copter::init_simple_bearing()
