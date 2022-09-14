@@ -47,7 +47,7 @@ public:
     void printf(const char *format, ...);
     void print(const char* str) {_port->write(str);} 
 
-    uint32_t last_frame_ms;
+    // uint32_t last_frame_ms;
 
     enum sterm {
         Lable2Flight = 0x66,
@@ -64,7 +64,7 @@ private:
     uint16_t _dis_BS1_BS2_cm;
     bool _dis_EN;
 
-        //位置计算 
+    //位置计算 
     bool location_calculate(uint8_t* data , int32_t alt);
     //距离计算
     bool distance_calculate(uint8_t* data);

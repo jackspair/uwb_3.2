@@ -21,7 +21,7 @@
 #define AP_UWB_BUFSIZE_RX 128
 #define AP_UWB_BUFSIZE_TX 128
 
-#define BASESTA_ALT_CM 0
+#define BASESTA_ALT_M 0.0
 
 #include "AP_UWB.h"
 
@@ -88,26 +88,30 @@ bool AP_UWB::location_calculate(uint8_t* data, int32_t alt) {
     if (check != ((d1 + d2) & 0xff)) return false;  //验证校验和
     /**
      * @brief 海伦公式
-     * 
      */
-    int32_t p; 
-    double s_cm2,h_cm,x_cm,y_cm,z_cm = alt + BASESTA_ALT_CM; //三角形面积，三角形高，得出的x坐标，y坐标，z轴数据
-    p = (get_dis_BS1_BS2_cm()+d1+d2)/2;
-    s_cm2=sqrt((double)(p*(p-get_dis_BS1_BS2_cm())*(p-d1)*(p-d2)));
+    double p, s_m2, h_m, x_m, y_m, z_m = 0 + BASESTA_ALT_M; //三角形面积，三角形高，得出的x坐标，y坐标，z轴数据
 
-    h_cm = s_cm2*2/(double)get_dis_BS1_BS2_cm();  //三角形高度
-    if(z_cm <= 20) //与原点没有高度差 
+    p = (get_dis_BS1_BS2_cm()+d1+d2)/200.0;
+    s_m2=sqrt((double)(p*(p-get_dis_BS1_BS2_cm()/100.0)*(p-d1/100.0)*(p-d2/100.0)));
+
+    h_m = s_m2*2/((double)get_dis_BS1_BS2_cm()/100.0);  //三角形高度
+    if(z_m <= 0.2) //与原点没有高度差 
     {
-        y_cm = sqrt(d1*d1 - h_cm*h_cm);
-        x_cm = h_cm;
+        y_m = sqrt(d1*d1/10000.0 - h_m*h_m);
+        x_m = h_m;
     }
     else{  //有高度差
-        y_cm = sqrt(d1*d1 - h_cm*h_cm);
-        x_cm = sqrt(h_cm*h_cm - z_cm*z_cm);
+        y_m = sqrt(d1*d1/10000.0  - h_m*h_m);
+        x_m = sqrt(h_m*h_m - z_m*z_m);
     }
-    _loc_NED.x = x_cm;
-    _loc_NED.y = y_cm;
-    _loc_NED.z = z_cm;
+    //验证是钝角三角形还是锐角三角形,(基站0夹角钝角时需要考虑)直角和基站1钝角可忽略 
+    if (d2 * d2 / 10000.0 >
+        (d1 * d1 / 10000.0 +
+         get_dis_BS1_BS2_cm() * get_dis_BS1_BS2_cm() / 10000.0))
+        y_m = -y_m;
+    _loc_NED.x = x_m;
+    _loc_NED.y = y_m;
+    _loc_NED.z = z_m;
     return true;
 }
 
