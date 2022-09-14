@@ -113,6 +113,7 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
     SCHED_TASK(rc_loop,              100,    130,  3),
     SCHED_TASK(throttle_loop,         50,     75,  6),
     SCHED_TASK_CLASS(AP_GPS,               &copter.gps,                 update,          50, 200,   9),
+    SCHED_TASK(uwb_update,            20,    100, 10),
 #if AP_OPTICALFLOW_ENABLED
     SCHED_TASK_CLASS(OpticalFlow,          &copter.optflow,             update,         200, 160,  12),
 #endif
@@ -757,6 +758,11 @@ bool Copter::get_wp_crosstrack_error_m(float &xtrack_error) const
     // see GCS_MAVLINK_Copter::send_nav_controller_output()
     xtrack_error = flightmode->crosstrack_error() * 0.01;
     return true;
+}
+
+void Copter::uwb_update()
+{
+    uwb.update(baro_alt); //传入气压计相对起飞高度
 }
 
 /*

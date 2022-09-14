@@ -69,6 +69,7 @@
 #include <AC_Sprayer/AC_Sprayer.h>          // Crop sprayer library
 #include <AP_ADSB/AP_ADSB.h>                // ADS-B RF based collision avoidance module library
 #include <AP_Proximity/AP_Proximity.h>      // ArduPilot proximity sensor library
+#include <AP_UWB/AP_UWB.h>
 
 // Configuration
 #include "defines.h"
@@ -307,7 +308,8 @@ private:
 #if AP_OPTICALFLOW_ENABLED
     OpticalFlow optflow;
 #endif
-
+    AP_UWB uwb;
+    void uwb_update();
     // system time in milliseconds of last recorded yaw reset from ekf
     uint32_t ekfYawReset_ms;
     int8_t ekf_primary_core;

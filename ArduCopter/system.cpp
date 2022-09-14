@@ -25,7 +25,7 @@ void Copter::init_ardupilot()
 #if HAL_MAX_CAN_PROTOCOL_DRIVERS
     can_mgr.init();
 #endif
-
+    uwb.init(serial_manager);
     // init cargo gripper
 #if GRIPPER_ENABLED == ENABLED
     g2.gripper.init();
