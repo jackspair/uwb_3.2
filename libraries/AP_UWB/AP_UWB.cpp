@@ -35,6 +35,7 @@ extern const AP_HAL::HAL& hal;
 AP_UWB::AP_UWB(void) {
     _port = NULL;
     _dis_EN = false;
+    _home_is_set = false;
 }
 
 // init - perform require initialisation including detecting which protocol to
@@ -89,7 +90,7 @@ bool AP_UWB::location_calculate(uint8_t* data, int32_t alt) {
     /**
      * @brief 海伦公式
      */
-    double p, s_m2, h_m, x_m, y_m, z_m = 0 + BASESTA_ALT_M; //三角形面积，三角形高，得出的x坐标，y坐标，z轴数据
+    double p, s_m2, h_m, x_m, y_m, z_m = alt + BASESTA_ALT_M; //三角形面积，三角形高，得出的x坐标，y坐标，z轴数据
 
     p = (get_dis_BS1_BS2_cm()+d1+d2)/200.0;
     s_m2=sqrt((double)(p*(p-get_dis_BS1_BS2_cm()/100.0)*(p-d1/100.0)*(p-d2/100.0)));
@@ -162,6 +163,25 @@ void AP_UWB::uwb_send2baseSta(uint16_t distance_cm)
     tx_buff[2] = distance_cm/256;
     tx_buff[3] = distance_cm%256;
     _port->write(tx_buff, 5);
+}
+
+
+//获取相对位置，北东
+bool AP_UWB::get_relative_position_NE_origin(Vector2f &posNE)
+{
+    if(get_dis_EN() == false)
+        return false;
+    posNE.x = _loc_NED.x;
+    posNE.y = -_loc_NED.y;
+    return true;
+}
+
+//获取z轴
+bool AP_UWB::get_relative_position_D_origin(float &posD)
+{
+    if (get_dis_EN() == false) return false;
+    posD = -_loc_NED.z;
+    return true;
 }
 
 //格式化打印

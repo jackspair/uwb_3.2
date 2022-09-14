@@ -33,6 +33,10 @@ public:
     void set_dis_EN() {_dis_EN = true;}
     //获取接收到基站距离状态
     bool get_dis_EN() {return _dis_EN;}
+    //设置当前位置为家位置
+    void set_home_is_set() {_home_is_set = true; _home_uwb = _loc_NED;}
+    //获取家位置是否设置
+    bool get_home_is_set() {return _home_is_set;}
     //获取基站间距离
     uint16_t get_dis_BS1_BS2_cm() {return _dis_BS1_BS2_cm;}
     //更新UWB数据
@@ -43,6 +47,10 @@ public:
     void uwb_send2lable(bool lable);
     //发送基站已获取定位数据
     void uwb_send2baseSta(uint16_t distance_cm);
+    //获取相对位置NE坐标
+    bool get_relative_position_NE_origin(Vector2f &posNE) ;
+    //获取相对位置D坐标
+    bool get_relative_position_D_origin(float &posD) ;
     //格式化输出
     void printf(const char *format, ...);
     void print(const char* str) {_port->write(str);} 
@@ -61,6 +69,8 @@ public:
 private:
     AP_HAL::UARTDriver *_port;              // UART used to send data to receiver
     Vector3f _loc_NED;
+    Vector3f _home_uwb;
+    bool _home_is_set;
     uint16_t _dis_BS1_BS2_cm;
     bool _dis_EN;
 

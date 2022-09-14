@@ -775,7 +775,7 @@ Copter::Copter(void)
     super_simple_cos_yaw(1.0),
     land_accel_ef_filter(LAND_DETECTOR_ACCEL_LPF_CUTOFF),
     rc_throttle_control_in_filter(1.0f),
-    inertial_nav(ahrs),
+    inertial_nav(ahrs, uwb),
     param_loader(var_info),
     flightmode(&mode_stabilize)
 {

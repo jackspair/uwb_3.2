@@ -7,19 +7,21 @@
 
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_NavEKF/AP_Nav_Common.h>              // definitions shared by inertial and ekf nav filters
+#include <AP_UWB/AP_UWB.h>
 
 class AP_InertialNav
 {
 public:
     // Constructor
-    AP_InertialNav(AP_AHRS &ahrs) :
-        _ahrs_ekf(ahrs)
+    AP_InertialNav(AP_AHRS &ahrs , AP_UWB &uwb) :
+        _ahrs_ekf(ahrs),
+        _uwb(uwb)
         {}
 
     /**
        update internal state
     */
-    void        update(bool high_vibes = false);
+    void        update(bool high_vibes = false , bool uwb_EN = false);
 
     /**
      * get_filter_status - returns filter status as a series of flags
@@ -81,4 +83,5 @@ private:
     Vector3f _relpos_cm;   // NEU
     Vector3f _velocity_cm; // NEU
     AP_AHRS &_ahrs_ekf;
+    AP_UWB &_uwb;
 };
