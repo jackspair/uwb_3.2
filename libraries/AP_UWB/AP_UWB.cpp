@@ -179,13 +179,13 @@ void AP_UWB::uwb_send2baseSta(uint16_t distance_cm)
 }
 
 
-//获取相对位置，北东
+//获取相对位置，定义x轴为北，y轴为-东，模拟成北东坐标
 bool AP_UWB::get_relative_position_NE_origin(Vector2f &posNE)
 {
     if(get_dis_EN() == false)
         return false;
     posNE.x = _loc_NED.x;
-    posNE.y = -_loc_NED.y; //默认前进为x，坐标为y，北东是x正轴为北，
+    posNE.y = -_loc_NED.y; //默认前进为x，左边为y，北东是x正轴为北，
     return true;
 }
 
