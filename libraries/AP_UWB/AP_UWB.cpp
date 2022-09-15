@@ -38,8 +38,6 @@ AP_UWB::AP_UWB(void) {
     _home_is_set = false;
 }
 
-// init - perform require initialisation including detecting which protocol to
-// use
 void AP_UWB::init(const AP_SerialManager& serial_manager) {
     // check for DEVO_DPort
     if ((_port = serial_manager.find_serial(
@@ -50,6 +48,13 @@ void AP_UWB::init(const AP_SerialManager& serial_manager) {
     }
 }
 
+/**
+ * @brief UWB数据更新
+ * 
+ * @param alt 高度数据来源
+ * @return true 
+ * @return false 
+ */
 bool AP_UWB::update(int32_t alt) { //高度来源气压计
     if (_port == NULL) return false;
     uint16_t num_cnt = _port->available();  //读取缓存区数据
@@ -79,6 +84,14 @@ bool AP_UWB::update(int32_t alt) { //高度来源气压计
     return false;
 }
 
+/**
+ * @brief 位置计算
+ * 
+ * @param data 位置原始数据指针
+ * @param alt 高度
+ * @return true 
+ * @return false 
+ */
 bool AP_UWB::location_calculate(uint8_t* data, int32_t alt) {
     if (*(data + 5) != sterm::Lable2Flight) return false;  //帧尾不对
     if (get_dis_EN() == false) return false;    //基站间距离未确认
@@ -96,7 +109,7 @@ bool AP_UWB::location_calculate(uint8_t* data, int32_t alt) {
     s_m2=sqrt((double)(p*(p-get_dis_BS1_BS2_cm()/100.0)*(p-d1/100.0)*(p-d2/100.0)));
 
     h_m = s_m2*2/((double)get_dis_BS1_BS2_cm()/100.0);  //三角形高度
-    if(z_m <= 0.2) //与原点没有高度差 
+    if(z_m <= 0.5) //与原点没有高度差 
     {
         y_m = sqrt(d1*d1/10000.0 - h_m*h_m);
         x_m = h_m;
@@ -172,7 +185,7 @@ bool AP_UWB::get_relative_position_NE_origin(Vector2f &posNE)
     if(get_dis_EN() == false)
         return false;
     posNE.x = _loc_NED.x;
-    posNE.y = -_loc_NED.y;
+    posNE.y = -_loc_NED.y; //默认前进为x，坐标为y，北东是x正轴为北，
     return true;
 }
 
