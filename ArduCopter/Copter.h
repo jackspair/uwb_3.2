@@ -238,6 +238,8 @@ private:
     RC_Channel *channel_throttle;
     RC_Channel *channel_yaw;
 
+    void channel_set_home();
+
     AP_Logger logger;
 
     // flight modes convenience array

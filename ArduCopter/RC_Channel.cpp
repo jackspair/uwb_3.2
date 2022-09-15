@@ -612,6 +612,20 @@ bool RC_Channel_Copter::do_aux_function(const aux_func_t ch_option, const AuxSwi
                 copter.ap.armed_with_airmode_switch = true;
             }
             break;
+        case AUX_FUNC::SET_HOME: //添加新的遥控器通道
+            switch (ch_flag) {
+                case AuxSwitchPos::LOW:
+
+                    break;
+                case AuxSwitchPos::MIDDLE:
+
+                    break;
+                case AuxSwitchPos::HIGH:
+                    if(copter.flightmode->mode_number() == Mode::Number::POSHOLD)
+                        copter.channel_set_home();
+                    break;
+            }
+            break;
 
     default:
         return RC_Channel::do_aux_function(ch_option, ch_flag);

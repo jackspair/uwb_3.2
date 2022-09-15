@@ -211,7 +211,7 @@ public:
         QRTL =               108, // QRTL mode
         // if you add something here, make sure to update the documentation of the parameter in RC_Channel.cpp!
         // also, if you add an option >255, you will need to fix duplicate_options_exist
-
+        SET_HOME =           110,
         // options 150-199 continue user rc switch options
         CRUISE =             150,  // CRUISE mode
         TURTLE =             151,  // Turtle mode - flip over after crash
