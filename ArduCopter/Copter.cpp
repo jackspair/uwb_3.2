@@ -762,7 +762,22 @@ bool Copter::get_wp_crosstrack_error_m(float &xtrack_error) const
 
 void Copter::uwb_update()
 {
-    uwb.update(baro_alt); //传入气压计相对起飞高度
+    uwb.update(baro_alt);  //传入气压计相对起飞高度
+    if (uwb.get_dis_EN() == true)  //基站间距离设置
+    {
+        gcs().send_text(MAV_SEVERITY_CRITICAL, "x:%.2f,y:%f,z:%f", uwb.get_location().x,uwb.get_location().y,uwb.get_location().z);
+    }
+    else
+    {
+        static int n = 0;
+        if(++n == 10)
+        {
+            n = 0;
+            uwb.send_range_cmd();
+        }
+        
+    }
+
 }
 
 /*

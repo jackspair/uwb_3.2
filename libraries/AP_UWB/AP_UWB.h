@@ -51,6 +51,8 @@ public:
     bool get_relative_position_NE_origin(Vector2f &posNE) ;
     //获取相对位置D坐标
     bool get_relative_position_D_origin(float &posD) ;
+    //发送给基站测距信息
+    void send_range_cmd();
     //格式化输出
     void printf(const char *format, ...);
     void print(const char* str) {_port->write(str);} 

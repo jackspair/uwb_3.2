@@ -65,11 +65,9 @@ bool AP_UWB::update(int32_t alt) { //高度来源气压计
     for (i = 0; i < num_cnt; i++) {
         if (data_buff[i] == 0xf6 && data_buff[i+1] == 0x6f)  //如果接收到帧头为标签到飞控
         {
-            if (get_dis_EN() == false)  //基站间距离未设置,返回失败
-                return false;
             if (location_calculate(&data_buff[i + 2], alt) ==  false)  //计算校验和失败,返回失败
                 return false;
-            printf("x:%f,y:%f,z:%f", _loc_NED.x,_loc_NED.y,_loc_NED.z);
+            // printf("x:%f,y:%f,z:%f", _loc_NED.x,_loc_NED.y,_loc_NED.z);
             return true;
             break;
         }
@@ -103,7 +101,7 @@ bool AP_UWB::location_calculate(uint8_t* data, int32_t alt) {
     /**
      * @brief 海伦公式
      */
-    double p, s_m2, h_m, x_m, y_m, z_m = alt + BASESTA_ALT_M; //三角形面积，三角形高，得出的x坐标，y坐标，z轴数据
+    double p, s_m2, h_m, x_m, y_m, z_m =  BASESTA_ALT_M; //三角形面积，三角形高，得出的x坐标，y坐标，z轴数据
 
     p = (get_dis_BS1_BS2_cm()+d1+d2)/200.0;
     s_m2=sqrt((double)(p*(p-get_dis_BS1_BS2_cm()/100.0)*(p-d1/100.0)*(p-d2/100.0)));
@@ -195,6 +193,12 @@ bool AP_UWB::get_relative_position_D_origin(float &posD)
     if (get_dis_EN() == false) return false;
     posD = -_loc_NED.z;
     return true;
+}
+
+void AP_UWB::send_range_cmd()
+{
+    uint8_t data[] = {0xf3,0x3f,0xff,0xff,0x33};
+    _port->write(data, 5);
 }
 
 //格式化打印
