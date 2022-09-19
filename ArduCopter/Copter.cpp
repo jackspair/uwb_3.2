@@ -764,7 +764,17 @@ void Copter::uwb_update()
 {
     if (uwb.get_dis_EN() == true)  //»ùÕ¾¼ä¾àÀëÉèÖÃ
     {
-        gcs().send_text(MAV_SEVERITY_CRITICAL, "x:%.2f,y:%.2f,z:%.2f", uwb.get_location().x,uwb.get_location().y,uwb.get_location().z);
+        static int i = 0;
+        if(++i >= 20)
+        {
+            i = 0;
+            gcs().send_text(MAV_SEVERITY_CRITICAL, "x:%.2f,y:%.2f,z:%.2f", uwb.get_location().x,uwb.get_location().y,uwb.get_location().z);
+            Vector2f temp;
+            if (uwb.get_relative_position_NE_origin(temp) == true)
+            {
+                gcs().send_text(MAV_SEVERITY_CRITICAL, "home:x:%.2f,y:%.2f", temp.x, temp.y);
+            }
+        } 
     }
     else
     {

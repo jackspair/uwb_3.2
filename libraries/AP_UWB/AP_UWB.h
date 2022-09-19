@@ -37,6 +37,7 @@ public:
     void set_home_is_set() {_home_is_set = true; _home_uwb = _loc_NED;}
     //获取家位置是否设置
     bool get_home_is_set() {return _home_is_set;}
+    Vector3f get_home() {return _home_uwb;}
     //获取基站间距离
     uint16_t get_dis_BS1_BS2_cm() {return _dis_BS1_BS2_cm;}
     //更新UWB数据
@@ -57,7 +58,7 @@ public:
     void printf(const char *format, ...);
     void print(const char* str) {_port->write(str);} 
 
-    // uint32_t last_frame_ms;
+    uint32_t last_frame_ms;
 
     enum sterm {
         Lable2Flight = 0x66,
@@ -72,6 +73,7 @@ private:
     AP_HAL::UARTDriver *_port;              // UART used to send data to receiver
     Vector3f _loc_NED;
     Vector3f _home_uwb;
+    Vector3f* _home_set_buff;
     bool _home_is_set;
     uint16_t _dis_BS1_BS2_cm;
     bool _dis_EN;

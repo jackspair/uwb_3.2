@@ -22,6 +22,7 @@
 #define AP_UWB_BUFSIZE_TX 128
 
 #define BASESTA_ALT_M 0.0
+#define HOME_SET_COUNT 10
 
 #include "AP_UWB.h"
 
@@ -34,8 +35,11 @@ extern const AP_HAL::HAL& hal;
 // constructor
 AP_UWB::AP_UWB(void) {
     _port = NULL;
+    _loc_NED = {-1,-1,-1};
     _dis_EN = false;
     _home_is_set = false;
+    _home_set_buff = NULL;
+    last_frame_ms = 0;
 }
 
 void AP_UWB::init(const AP_SerialManager& serial_manager) {
@@ -65,8 +69,20 @@ bool AP_UWB::update(int32_t alt) { //高度来源气压计
     for (i = 0; i < num_cnt; i++) {
         if (data_buff[i] == 0xf6 && data_buff[i+1] == 0x6f)  //如果接收到帧头为标签到飞控
         {
-            if (location_calculate(&data_buff[i + 2], alt) ==  false)  //计算校验和失败,返回失败
+            if(location_calculate(&data_buff[i + 2], alt) ==  false)  //计算校验和失败,返回失败
                 return false;
+            if(!_home_is_set && get_dis_EN() && last_frame_ms != 0) //第一次获取到距离位置设置为Home位置
+            {
+                static int n = 0;
+                if(get_location().x != 0 && get_location().y != 0)
+                {
+                    if(++n == 100)
+                    {
+                        n = 0;
+                        set_home_is_set();
+                    }
+                }
+            }
             // printf("x:%f,y:%f,z:%f", _loc_NED.x,_loc_NED.y,_loc_NED.z);
             return true;
             break;
@@ -122,8 +138,9 @@ bool AP_UWB::location_calculate(uint8_t* data, int32_t alt) {
          get_dis_BS1_BS2_cm() * get_dis_BS1_BS2_cm() / 10000.0))
         y_m = -y_m;
     _loc_NED.x = x_m;
-    _loc_NED.y = y_m;
+    _loc_NED.y = -y_m;
     _loc_NED.z = z_m;
+    last_frame_ms = AP_HAL::millis();
     return true;
 }
 
@@ -182,8 +199,8 @@ bool AP_UWB::get_relative_position_NE_origin(Vector2f &posNE)
 {
     if(get_dis_EN() == false)
         return false;
-    posNE.x = _loc_NED.x;
-    posNE.y = -_loc_NED.y; //默认前进为x，左边为y，北东是x正轴为北，
+    posNE.x = _loc_NED.x - _home_uwb.x;
+    posNE.y = _loc_NED.y - _home_uwb.y; //默认前进为x，左边为y，北东是x正轴为北，
     return true;
 }
 
