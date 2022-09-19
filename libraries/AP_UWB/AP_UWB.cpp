@@ -73,7 +73,7 @@ bool AP_UWB::update(int32_t alt) { //高度来源气压计
         }
         if (data_buff[i] == 0xf4 && data_buff[i+1] == 0x4f)  //如果接收到帧头为基站到飞控
         {
-            if(distance_calculate(&data_buff[i+2]) == false) return false;  //基站间数据帧尾异常
+            if(distance_calculate(&data_buff[i+2]) == false) return false;  //基站间数据帧尾是否异常
             uwb_send2baseSta(get_dis_BS1_BS2_cm());   //返回给基站已接收到距离数据
             return true;
         }
@@ -197,7 +197,7 @@ bool AP_UWB::get_relative_position_D_origin(float &posD)
 
 void AP_UWB::send_range_cmd()
 {
-    uint8_t data[] = {0xf3,0x3f,0xff,0xff,0x33};
+    uint8_t data[5] = {0xf3,0x3f,0xff,0xff,0x33};
     _port->write(data, 5);
 }
 
