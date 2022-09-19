@@ -642,6 +642,29 @@ void Copter::one_hz_loop()
 #endif
 
     AP_Notify::flags.flying = !ap.land_complete;
+
+/*    gcs().send_text(MAV_SEVERITY_CRITICAL, "x:%f,y:%f,z:%f",
+                inertial_nav.get_velocity_neu_cms().x,
+                inertial_nav.get_velocity_neu_cms().y,
+                inertial_nav.get_velocity_neu_cms().z);
+
+     gcs().send_text(MAV_SEVERITY_CRITICAL,"lat:%d,lng:%d,alt:%d", gps.location().lat,gps.location().lng,gps.location().alt);   
+
+    //通过串口接收uwb数据转换成gps信号替换本身gps信号
+    //先将串口初始化
+    hal.serial(2)->begin(38400);
+    Uart2_Rx.Rx_num=hal.serial(2)->available();
+    //接收到了uwb的坐标数据并进行解析（共8个字节，34为基站0的距离，56为基站1的距离）
+    if(Uart2_Rx.Rx_num>0)
+    {
+    }
+    hal.serial(2)->read();
+    hal.serial(2)->printf("hello world");*/
+    uint8_t i = gps.num_sensors();
+    for (int n = 0;n<i;n++)
+    {
+        gcs().send_text(MAV_SEVERITY_CRITICAL,"%d:%d", n, (uint8_t)gps.get_type(n));
+    }
 }
 
 void Copter::init_simple_bearing()
@@ -762,7 +785,7 @@ bool Copter::get_wp_crosstrack_error_m(float &xtrack_error) const
 
 void Copter::uwb_update()
 {
-    uwb.update(baro_alt); //������ѹ�������ɸ߶�
+    uwb.update(baro_alt); //������ѹ�������ɸ߶�
 }
 
 /*
