@@ -112,6 +112,7 @@ bool AP_UWB::location_calculate(uint8_t* data, int32_t alt) {
 
     uint16_t d1 = (*data & 0xff) << 8 | (*(data + 1) & 0xff), //基站0距离
              d2 = (*(data + 2) & 0xff) << 8 | (*(data + 3) & 0xff); //基站1距离
+    if(d1 == 0 && !get_dis_EN())  return false;  //双模基站处于测距状态
     uint8_t check = *(data + 4);  
     if (check != ((d1 + d2) & 0xff)) return false;  //验证校验和
     /**
