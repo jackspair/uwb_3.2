@@ -41,7 +41,8 @@ public:
     //获取基站间距离
     uint16_t get_dis_BS1_BS2_cm() {return _dis_BS1_BS2_cm;}
     //更新UWB数据
-    bool update(int32_t alt);      
+    bool update(int32_t alt); 
+    bool update_lora();     
     //获取位置数据NED
     Vector3f get_location(void) {return _loc_NED;} 
     //发送给标签到达指定位置，切换定位基站

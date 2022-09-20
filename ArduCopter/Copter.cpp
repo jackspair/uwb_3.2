@@ -113,7 +113,8 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
     SCHED_TASK(rc_loop,              100,    130,  3),
     SCHED_TASK(throttle_loop,         50,     75,  6),
     SCHED_TASK_CLASS(AP_GPS,               &copter.gps,                 update,          50, 200,   9),
-    SCHED_TASK(uwb_update,            20,    100, 10),
+    SCHED_TASK(uwb_update,            20,    200, 10),
+    SCHED_TASK(lora_update,            20,    100, 11),
 #if AP_OPTICALFLOW_ENABLED
     SCHED_TASK_CLASS(OpticalFlow,          &copter.optflow,             update,         200, 160,  12),
 #endif
@@ -763,7 +764,7 @@ bool Copter::get_wp_crosstrack_error_m(float &xtrack_error) const
 void Copter::uwb_update()
 {
     uwb.update(baro_alt);  //传入气压计相对起飞高度
-    if (uwb.get_dis_EN() == true)  //基站间距离设置
+    if (uwb.get_dis_EN() == true )  //基站间距离设置
     {
         static int i = 0;
         if(++i >= 20)
@@ -792,6 +793,11 @@ void Copter::uwb_update()
     }
 }
 
+
+void Copter::lora_update()
+{
+    uwb.update_lora();
+}
 /*
   constructor for main Copter class
  */

@@ -310,6 +310,7 @@ private:
 #endif
     AP_UWB uwb;
     void uwb_update();
+    void lora_update();
     // system time in milliseconds of last recorded yaw reset from ekf
     uint32_t ekfYawReset_ms;
     int8_t ekf_primary_core;
