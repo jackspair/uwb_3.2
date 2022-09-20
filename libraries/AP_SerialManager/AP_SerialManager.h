@@ -170,6 +170,7 @@ public:
         SerialProtocol_CoDevESC = 41,
         SerialProtocol_MSP_DisplayPort = 42,
         SerialProtocol_UWB = 43,
+        SerialProtocol_LORA = 44,
         SerialProtocol_NumProtocols                    // must be the last value
     };
 

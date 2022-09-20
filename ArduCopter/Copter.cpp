@@ -762,17 +762,22 @@ bool Copter::get_wp_crosstrack_error_m(float &xtrack_error) const
 
 void Copter::uwb_update()
 {
+    uwb.update(baro_alt);  //传入气压计相对起飞高度
     if (uwb.get_dis_EN() == true)  //基站间距离设置
     {
         static int i = 0;
         if(++i >= 20)
         {
             i = 0;
-            gcs().send_text(MAV_SEVERITY_CRITICAL, "x:%.2f,y:%.2f,z:%.2f", uwb.get_location().x,uwb.get_location().y,uwb.get_location().z);
+            uwb.printf("\r\nuwb:x:%.2f,y:%.2f,z:%.2f\r\n", uwb.get_location().x, uwb.get_location().y, uwb.get_location().z);
+            Vector3f gps_temp  = inertial_nav.get_position_neu_cm();
+            uwb.printf("gps:x:%.2f,y:%.2f,z:%.2f\r\n", gps_temp.x, gps_temp.y, gps_temp.z);
             Vector2f temp;
+            float z_temp;
             if (uwb.get_relative_position_NE_origin(temp) == true)
             {
-                gcs().send_text(MAV_SEVERITY_CRITICAL, "home:x:%.2f,y:%.2f", temp.x, temp.y);
+                if(uwb.get_relative_position_D_origin(z_temp) == true)
+                    uwb.printf("home:x:%.2f,y:%.2f,z:%.2f\r\n", temp.x, temp.y, z_temp);
             }
         } 
     }
@@ -785,7 +790,6 @@ void Copter::uwb_update()
             uwb.send_range_cmd();
         }
     }
-    uwb.update(baro_alt);  //传入气压计相对起飞高度
 }
 
 /*

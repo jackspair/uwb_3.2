@@ -71,6 +71,7 @@ public:
 
 private:
     AP_HAL::UARTDriver *_port;              // UART used to send data to receiver
+    AP_HAL::UARTDriver *_port_Lora;              // UART used to send data to receiver
     Vector3f _loc_NED;
     Vector3f _home_uwb;
     Vector3f* _home_set_buff;
