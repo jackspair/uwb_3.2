@@ -85,7 +85,7 @@ bool AP_UWB::update(int32_t alt) { //高度来源气压计
             if(!_home_is_set && get_dis_EN() && last_frame_ms != 0) //第一次获取到距离位置设置为Home位置
             {
                 static int n = 0;
-                if(get_location().x != 0 && get_location().y != 0)
+                if((get_location().x-0.1) >= 0 && (get_location().y-0.1) >= 0)
                 {
                     if(++n == 100)
                     {
