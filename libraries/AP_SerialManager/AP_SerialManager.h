@@ -170,6 +170,7 @@ public:
         SerialProtocol_CoDevESC = 41,
         SerialProtocol_MSP_DisplayPort = 42,
         SerialProtocol_UWB = 43,
+        SerialProtocol_LD19 = 44,   //在地面站全部参数的某个类型里面设为44，即连接ld19
         SerialProtocol_NumProtocols                    // must be the last value
     };
 

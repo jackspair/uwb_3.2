@@ -70,6 +70,7 @@
 #include <AP_ADSB/AP_ADSB.h>                // ADS-B RF based collision avoidance module library
 #include <AP_Proximity/AP_Proximity.h>      // ArduPilot proximity sensor library
 #include <AP_UWB/AP_UWB.h>
+#include <AP_LD19/AP_LD19.h>
 
 // Configuration
 #include "defines.h"
@@ -310,6 +311,9 @@ private:
 #endif
     AP_UWB uwb;
     void uwb_update();
+
+    AP_LD19 ld19;
+    void LD19_update(void);
     // system time in milliseconds of last recorded yaw reset from ekf
     uint32_t ekfYawReset_ms;
     int8_t ekf_primary_core;
@@ -790,6 +794,7 @@ private:
     void standby_update();
 
     // Log.cpp
+    void Log_Write_ld19();
     void Log_Write_Control_Tuning();
     void Log_Write_Attitude();
     void Log_Write_EKF_POS();

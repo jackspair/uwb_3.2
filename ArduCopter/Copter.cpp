@@ -114,6 +114,7 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
     SCHED_TASK(throttle_loop,         50,     75,  6),
     SCHED_TASK_CLASS(AP_GPS,               &copter.gps,                 update,          50, 200,   9),
     SCHED_TASK(uwb_update,            20,    100, 10),
+    SCHED_TASK(LD19_update,           400,   100, 9),
 #if AP_OPTICALFLOW_ENABLED
     SCHED_TASK_CLASS(OpticalFlow,          &copter.optflow,             update,         200, 160,  12),
 #endif
@@ -660,11 +661,8 @@ void Copter::one_hz_loop()
     }
     hal.serial(2)->read();
     hal.serial(2)->printf("hello world");*/
-    uint8_t i = gps.num_sensors();
-    for (int n = 0;n<i;n++)
-    {
-        gcs().send_text(MAV_SEVERITY_CRITICAL,"%d:%d", n, (uint8_t)gps.get_type(n));
-    }
+    gcs().send_text(MAV_SEVERITY_CRITICAL, "speed:%d",
+                ld19.Pack_Data.speed);
 }
 
 void Copter::init_simple_bearing()
@@ -786,6 +784,15 @@ bool Copter::get_wp_crosstrack_error_m(float &xtrack_error) const
 void Copter::uwb_update()
 {
     uwb.update(baro_alt); //������ѹ�������ɸ߶�
+}
+
+void Copter::LD19_update()
+{
+    ld19.update();
+    if(ld19.update())
+    {
+        Log_Write_ld19();
+    }
 }
 
 /*

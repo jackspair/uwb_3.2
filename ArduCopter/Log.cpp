@@ -409,6 +409,29 @@ void Copter::Log_Write_Guided_Attitude_Target(ModeGuided::SubMode target_type, f
     logger.WriteBlock(&pkt, sizeof(pkt));
 }
 
+
+struct PACKED log_ld19 {
+    LOG_PACKET_HEADER;
+    uint64_t time_us;
+    uint16_t start_angle;
+    uint16_t end_angle;
+};
+
+void Copter::Log_Write_ld19()
+{
+    
+    struct log_ld19 pkt = {
+        LOG_PACKET_HEADER_INIT(LOG_DATA_INT16_MSG),
+        time_us      : AP_HAL::micros64(),
+        start_angle  : ld19.Pack_Data.start_angle,
+        end_angle    : ld19.Pack_Data.end_angle,
+    };
+    logger.WriteCriticalBlock(&pkt, sizeof(pkt));
+}
+
+
+
+
 // type and unit information can be found in
 // libraries/AP_Logger/Logstructure.h; search for "log_Units" for
 // units and "Format characters" for field type information
@@ -427,6 +450,7 @@ const struct LogStructure Copter::log_structure[] = {
     { LOG_PARAMTUNE_MSG, sizeof(log_ParameterTuning),
       "PTUN", "QBfff",         "TimeUS,Param,TunVal,TunMin,TunMax", "s----", "F----" },
 
+   
 // @LoggerMessage: CTUN
 // @Description: Control Tuning information
 // @Field: TimeUS: Time since system startup
@@ -472,6 +496,9 @@ const struct LogStructure Copter::log_structure[] = {
 // @Field: TimeUS: Time since system startup
 // @Field: Id: Data type identifier
 // @Field: Value: Value
+
+    { LOG_LD19_MSG, sizeof(log_ParameterTuning),
+      "LD19", "QHH",         "TimeUS,start_angle,end_angle", "s----", "F----" },
 
     { LOG_CONTROL_TUNING_MSG, sizeof(log_Control_Tuning),
       "CTUN", "Qffffffefffhh", "TimeUS,ThI,ABst,ThO,ThH,DAlt,Alt,BAlt,DSAlt,SAlt,TAlt,DCRt,CRt", "s----mmmmmmnn", "F----00B000BB" , true },
