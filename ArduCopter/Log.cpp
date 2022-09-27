@@ -421,7 +421,7 @@ void Copter::Log_Write_ld19()
 {
     
     struct log_ld19 pkt = {
-        LOG_PACKET_HEADER_INIT(LOG_DATA_INT16_MSG),
+        LOG_PACKET_HEADER_INIT(LOG_LD19_MSG),
         time_us      : AP_HAL::micros64(),
         start_angle  : ld19.Pack_Data.start_angle,
         end_angle    : ld19.Pack_Data.end_angle,
