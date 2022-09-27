@@ -661,8 +661,7 @@ void Copter::one_hz_loop()
     }
     hal.serial(2)->read();
     hal.serial(2)->printf("hello world");*/
-    //gcs().send_text(MAV_SEVERITY_CRITICAL, "speed:%d",
-    //            ld19.Pack_Data.speed);
+    gcs().send_text(MAV_SEVERITY_CRITICAL, "speed:%d",ld19.Pack_Data.speed);
 }
 
 void Copter::init_simple_bearing()
@@ -789,10 +788,10 @@ void Copter::uwb_update()
 void Copter::LD19_update()
 {
     ld19.update();
-    if(ld19.update())
-    {
+    //if(ld19.update())
+   // {
         Log_Write_ld19();
-    }
+   // }
 }
 
 /*
