@@ -21,21 +21,22 @@
 #define ANGLE_PER_FRAME 12
 #define HEADER 0x54
 #define POINT_PER_PACK 12
-#define LENGTH  0x2C 	
+#define LENGTH  0x2C 
+#define SAFE_DISTANCE 1000	
 
 class AP_LD19 {
 
 public:
     AP_LD19();
-
+    
     /* Do not allow copies */
     AP_LD19(const AP_LD19 &other) = delete;
     AP_LD19 &operator=(const AP_LD19&) = delete;
 
     // init - perform required initialisation
     void init(const AP_SerialManager& serial_manager);
-
     bool update(void); 
+    void LD19_Data_Process(uint16_t Safe_Distance);
 
     typedef struct __attribute__((packed)) Point_Data
     {
@@ -59,7 +60,14 @@ public:
     LiDARFrameTypeDef Pack_Data; //接收到的数据
 
     uint32_t last_frame_time_ms;
-
+    
+    struct RES
+    {
+        uint16_t Step;    
+        float Danger_Angle;      //单位度
+        float Danger_Distance;   //单位厘米
+    }res;
+    
 private:
     AP_HAL::UARTDriver *_port;
 

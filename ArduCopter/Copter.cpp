@@ -114,7 +114,7 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
     SCHED_TASK(throttle_loop,         50,     75,  6),
     SCHED_TASK_CLASS(AP_GPS,               &copter.gps,                 update,          50, 200,   9),
     SCHED_TASK(uwb_update,            20,    100, 10),
-    SCHED_TASK(LD19_update,           400,   100, 9),
+    SCHED_TASK(LD19_update,           50,   100, 11),
 #if AP_OPTICALFLOW_ENABLED
     SCHED_TASK_CLASS(OpticalFlow,          &copter.optflow,             update,         200, 160,  12),
 #endif
@@ -261,7 +261,7 @@ void Copter::fast_loop()
         heli_update_autorotation();
     #endif
 #endif //HELI_FRAME
-
+    
     // Inertial Nav
     // --------------------
     read_inertia();
@@ -661,7 +661,7 @@ void Copter::one_hz_loop()
     }
     hal.serial(2)->read();
     hal.serial(2)->printf("hello world");*/
-    gcs().send_text(MAV_SEVERITY_CRITICAL, "speed:%d",ld19.Pack_Data.speed);
+    //gcs().send_text(MAV_SEVERITY_CRITICAL, "speed:%d",ld19.Pack_Data.speed);
 }
 
 void Copter::init_simple_bearing()
@@ -787,11 +787,12 @@ void Copter::uwb_update()
 
 void Copter::LD19_update()
 {
-    ld19.update();
-    //if(ld19.update())
-   // {
+    //ld19.update();
+    if(ld19.update())
+    {
+        gcs().send_text(MAV_SEVERITY_CRITICAL, "RX success all");
         Log_Write_ld19();
-   // }
+    }
 }
 
 /*

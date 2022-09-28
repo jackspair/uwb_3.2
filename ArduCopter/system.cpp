@@ -26,6 +26,7 @@ void Copter::init_ardupilot()
     can_mgr.init();
 #endif
     uwb.init(serial_manager);
+    ld19.init(serial_manager);
     // init cargo gripper
 #if GRIPPER_ENABLED == ENABLED
     g2.gripper.init();
