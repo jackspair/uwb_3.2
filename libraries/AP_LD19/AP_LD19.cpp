@@ -236,13 +236,13 @@ void AP_LD19::LD19_Data_Process(uint16_t Safe_Distance)
             //判断此时角度值(单位是0.01度)
             if(Pack_Data.start_angle > Pack_Data.end_angle)
             {
-                Pack_Data.end_angle+=360;
+                Pack_Data.end_angle+=36000;
             }
             res.Step = (Pack_Data.end_angle - Pack_Data.start_angle)/(12 - 1);
             res.Danger_Angle = (Pack_Data.start_angle + res.Step*i)/100.0; 
             res.Danger_Distance = (Pack_Data.point[i].distance)/10.0;
             //将角度值和危险距离值发出
-
+            
         }
     }
 }
