@@ -18,70 +18,87 @@
 #include <AP_HAL/AP_HAL.h>
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_SerialManager/AP_SerialManager.h>
+#include "UWB_LOCATION.h"
+#define UWB_Hz  20  //uwb刷新数据频率
+#define UWB_T  200  //uwb线程运行最大时间
+#define BASESTA_B 1 //双模基站b
+#define BASESTA_C 2 //c
+
 
 class AP_UWB {
 public:
     AP_UWB();
-
     /* Do not allow copies */
     AP_UWB(const AP_UWB &other) = delete;
     AP_UWB &operator=(const AP_UWB&) = delete;
 
     //初始化UWB串口
     void init(const AP_SerialManager& serial_manager); 
-    //设置接收到基站间距离
-    void set_dis_EN() {_dis_EN = true;}
-    //获取接收到基站距离状态
+    //获取坐标系是否建立
     bool get_dis_EN() {return _dis_EN;}
     //设置当前位置为家位置
-    void set_home_is_set() {_home_is_set = true; _home_uwb = _loc_NED;}
+    void set_home_is_set() {_home_is_set = true; _home_uwb = _location;}
     //获取家位置是否设置
     bool get_home_is_set() {return _home_is_set;}
     Vector3f get_home() {return _home_uwb;}
-    //获取基站间距离
-    uint16_t get_dis_BS1_BS2_cm() {return _dis_BS1_BS2_cm;}
-    //更新UWB数据
+    //更新UWB 标签数据
     bool update(int32_t alt); 
-    bool update_lora();     
-    //获取位置数据NED
-    Vector3f get_location(void) {return _loc_NED;} 
+    //更新UWB LoRa数据
+    bool update(); 
     //发送给标签到达指定位置，切换定位基站
     void uwb_send2lable(bool lable);
     //发送基站已获取定位数据
-    void uwb_send2baseSta(uint16_t distance_cm);
+    void uwb_send2baseSta(int num);
     //获取相对位置NE坐标
     bool get_relative_position_NE_origin(Vector2f &posNE) ;
     //获取相对位置D坐标
     bool get_relative_position_D_origin(float &posD) ;
     //发送给基站测距信息
-    void send_range_cmd();
+    void send_range_cmd(int num);
     //格式化输出
     void printf(const char *format, ...);
-    void print(const char* str) {_port->write(str);} 
+    void print(const char* str) {_port_uwb->write(str);} 
+
+    int get_dis_EN_step() { return _dis_EN_step; }
+
+    UWB_LOCATION::POINT_POS get_uwb_loc_pos() { return uwb_loc.get_n_pos();}
 
     uint32_t last_frame_ms;
 
-    enum sterm {
-        Lable2Flight = 0x66,
-        Flight2Lable = 0x55,
-        BaseStation2Flight = 0x44,
-        Flight2BaseStation = 0x33,
-        Flight2PC = 0x22,
-    };
-    
+    UWB_LOCATION uwb_loc;
 
 private:
-    AP_HAL::UARTDriver *_port;              // UART used to send data to receiver
+    AP_HAL::UARTDriver *_port_uwb;              // UART used to send data to receiver
     AP_HAL::UARTDriver *_port_Lora;              // UART used to send data to receiver
-    Vector3f _loc_NED;
-    Vector3f _home_uwb;
-    Vector3f* _home_set_buff;
-    bool _home_is_set;
-    uint16_t _dis_BS1_BS2_cm;
-    bool _dis_EN;
 
-    //位置计算 
-    bool location_calculate(uint8_t* data , int32_t alt);
+    
+
+    Vector3f _loc_NED;//当前位置北东地坐标
+
+    Vector3f _location;//当前位置绝对坐标
+
+    Vector3f _home_uwb;//家位置坐标
+
+    bool _home_is_set;//家位置是否设置
+
+    uint32_t _dis_ab;//参考点ab间距
+    uint32_t _dis_ac;//ac
+    uint32_t _dis_bc;//bc
+
+    bool _dis_EN;//坐标系已建立
+
+    int _dis_EN_step;//坐标系建立步骤
+
+    uint32_t _dis_na_cm; //无人机与基站参考点a的距离(基站1)
+    uint32_t _dis_nb_cm; //b(基站2)
+    uint32_t _dis_nc_cm; //c(基站3)
+
     //距离计算
-    bool distance_calculate(uint8_t* data);
+    bool distance_calculate(uint8_t* data, int baseSta);
+
+    //位置距离计算
+    bool location_calculate(uint8_t* data);
+
+    bool update_uwb_loc() { return  uwb_loc.loc_pos(_dis_na_cm, _dis_nb_cm, _dis_nc_cm); }
+
 };

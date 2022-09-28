@@ -18,6 +18,7 @@
 */
 
 #define AP_UWB_BAUD 115200
+#define AP_UWB_LORA 115200
 #define AP_UWB_BUFSIZE_RX 512
 #define AP_UWB_BUFSIZE_TX 128
 
@@ -25,31 +26,40 @@
 #define HOME_SET_COUNT 10
 
 #include "AP_UWB.h"
+#include "UWB_LOCATION.h"
 
 #include "string.h"
 #include "stdio.h"
 #include "stdarg.h"
+#define Usqrt(x) sqrt(x)
+#define BC_DIS_CM 800
+
+
 
 extern const AP_HAL::HAL& hal;
 
 // constructor
 AP_UWB::AP_UWB(void) {
-    _port = NULL;
+    _port_uwb = NULL;
     _port_Lora = NULL;
-    _loc_NED = {-1,-1,-1};
+
+    _dis_ab = 0;
+    _dis_ac = 0;
+    _dis_bc = BC_DIS_CM;
+
     _dis_EN = false;
     _home_is_set = false;
-    _home_set_buff = NULL;
+    _dis_EN_step = 0;
     last_frame_ms = 0;
 }
 
 void AP_UWB::init(const AP_SerialManager& serial_manager) {
     // check for DEVO_DPort
-    if ((_port = serial_manager.find_serial(
+    if ((_port_uwb = serial_manager.find_serial(
              AP_SerialManager::SerialProtocol_UWB, 0))) {
-        _port->set_flow_control(AP_HAL::UARTDriver::FLOW_CONTROL_DISABLE);
+        _port_uwb->set_flow_control(AP_HAL::UARTDriver::FLOW_CONTROL_DISABLE);
         // initialise uart
-        _port->begin(AP_UWB_BAUD, AP_UWB_BUFSIZE_RX, AP_UWB_BUFSIZE_TX);
+        _port_uwb->begin(AP_UWB_BAUD, AP_UWB_BUFSIZE_RX, AP_UWB_BUFSIZE_TX);
     }
     if ((_port_Lora = serial_manager.find_serial(
              AP_SerialManager::SerialProtocol_LORA, 0))) {
@@ -67,40 +77,76 @@ void AP_UWB::init(const AP_SerialManager& serial_manager) {
  * @return false 
  */
 bool AP_UWB::update(int32_t alt) { //高度来源气压计
-    if (_port == NULL) return false;
-    uint16_t num_cnt = _port->available();  //读取缓存区数据
+    if (_port_uwb == NULL) return false;
+
+    uint16_t num_cnt = _port_uwb->available();  //读取缓存区数据
     if (num_cnt == 0)  return false;
-    uint8_t data_buff[num_cnt];//定义数据缓存区
+
+    if (_dis_EN == false)   return false;
+    uint8_t data_temp, step = 0;
+    uint8_t data_buff[20];
     int i = 0;
-    _port->read(data_buff, num_cnt); //读取所有数据到缓存区
-    // _port_Lora->write(0xff);
-    // _port_Lora->write(data_buff, num_cnt);
-    // _port_Lora->write(0xff);
-    for (i = 0; i < num_cnt; i++) {
-        if (data_buff[i] == 0xf6 && data_buff[i+1] == 0x6f)  //如果接收到帧头为标签到飞控
+    for ( i = 0; i < num_cnt; i++)
+    {
+        if(step == 0)   data_temp = _port_uwb->read();
+        switch (step)
         {
-            if(location_calculate(&data_buff[i + 2], alt) ==  false)  //计算校验和失败,返回失败
-                return false;
-            // printf("\r\nrx:x:%.2f,y:%.2f,z:%.2f\r\n", _loc_NED.x,  _loc_NED.y,  _loc_NED.z);
-            if(!_home_is_set && get_dis_EN() && last_frame_ms != 0) //第一次获取到距离位置设置为Home位置
+        case 0:
+            if(data_temp == 0xf6)
             {
-                static int n = 0;
-                if((get_location().x-0.1) >= 0 && (get_location().y-0.1) >= 0)
-                {
-                    if(++n == 100)
-                    {
-                        n = 0;
-                        set_home_is_set();
-                    }
-                }
+                step = 1;
+                _port_uwb->read(data_buff, 9);
             }
-            // printf("x:%f,y:%f,z:%f", _loc_NED.x,_loc_NED.y,_loc_NED.z);
-            return true;
+            break;
+        case 1:
+            if(location_calculate(data_buff) == true)
+            {
+                // printf("bool:%d\r\n", uwb_loc.loc_pos(_dis_na_cm, _dis_nb_cm, _dis_nc_cm));
+                // UWB_LOCATION::POINT_POS temp = get_uwb_loc_pos();
+                // printf("x:%d, y:%d, z:%d\r\n", temp.loc.x, temp.loc.y, temp.loc.z);
+
+                // UWB_LOCATION::LOC_POINT temp = uwb_loc.a;
+                // printf("ax:%d, y:%d, z:%d\r\n", temp.loc.x, temp.loc.y, temp.loc.z);
+                // temp = uwb_loc.b1;
+                // printf("bx:%d, y:%d, z:%d\r\n", temp.loc.x, temp.loc.y, temp.loc.z);
+                // temp = uwb_loc.c;
+                // printf("cx:%d, y:%d, z:%d\r\n", temp.loc.x, temp.loc.y, temp.loc.z);
+                // printf("temp:%d\r\n", uwb_loc.temp);
+
+                if(update_uwb_loc() == true)
+                {
+                    printf("temp:%.5f\r\n", uwb_loc.temp);
+                    return true;
+                }
+                // printf("na:%d,nb:%d,nc:%d\r\n", _dis_na_cm, _dis_nb_cm, _dis_nc_cm);
+                return false;
+            }
+            return false;
+            break;       
+        default:
             break;
         }
     }
-    _port_Lora->write(data_buff, num_cnt);
     return false;
+}
+
+/**
+ * @brief 坐标系建立后基站abc与无人机所在点的距离数据处理
+ * 
+ * @param data 
+ * @return true 
+ * @return false 
+ */
+bool AP_UWB::location_calculate(uint8_t* data)
+{
+    if(*data != 0x6f && *(data+8) != 0x66)  return false;
+    uint8_t check = ((*(data+2))&0xff) + ((*(data+4))&0xff) + ((*(data+6))&0xff);
+    if(check != *(data+7))  return false;
+    _dis_na_cm = (*(data+1)&0xff)<<8 | (*(data+2)&0xff);
+    _dis_nb_cm = (*(data+3)&0xff)<<8 | (*(data+4)&0xff);
+    _dis_nc_cm = (*(data+5)&0xff)<<8 | (*(data+6)&0xff);
+    // printf("check:%d,na:%d,nb:%d,nc:%d\r\n", check, _dis_na_cm, _dis_nb_cm, _dis_nc_cm);
+    return true;
 }
 
 /**
@@ -109,70 +155,64 @@ bool AP_UWB::update(int32_t alt) { //高度来源气压计
  * @return true 
  * @return false 
  */
-bool AP_UWB::update_lora() 
+bool AP_UWB::update() 
 { 
     if (_port_Lora == NULL) return false;
+
     uint16_t num_cnt = _port_Lora->available();  //读取缓存区数据
     if (num_cnt == 0)  return false;
-    uint8_t data_buff[num_cnt];//定义数据缓存区
-    _port_Lora->read(data_buff, num_cnt); //读取所有数据到缓存区
-    int i = 0;
-    for(i = 0; i < num_cnt; i++) {
-            if (data_buff[i] == 0xf4 && data_buff[i+1] == 0x4f)  //如果接收到帧头为基站到飞控
-            {
-                if(distance_calculate(&data_buff[i+2]) == false) return false;  //基站间数据帧尾是否异常
-                uwb_send2baseSta(get_dis_BS1_BS2_cm());   //返回给基站已接收到距离数据
-                return true;
-            }
-    }
-    _port_Lora->write(data_buff, num_cnt);
-    return true;
-}
-/**
- * @brief 位置计算
- * 
- * @param data 位置原始数据指针
- * @param alt 高度
- * @return true 
- * @return false 
- */
-bool AP_UWB::location_calculate(uint8_t* data, int32_t alt) {
-    if (*(data + 5) != sterm::Lable2Flight) return false;  //帧尾不对
-    if (get_dis_EN() == false) return false;    //基站间距离未确认
 
-    uint16_t d1 = (*data & 0xff) << 8 | (*(data + 1) & 0xff), //基站0距离
-             d2 = (*(data + 2) & 0xff) << 8 | (*(data + 3) & 0xff); //基站1距离
-    if(d1 == 0)  return false;  //双模基站处于测距状态
-    uint8_t check = *(data + 4);  
-    if (check != ((d1 + d2) & 0xff)) return false;  //验证校验和
-    /**
-     * @brief 海伦公式
-     */
-    double p, s_m2, h_m, x_m, y_m, z_m = (double)alt/100 + BASESTA_ALT_M; //三角形面积，三角形高，得出的x坐标，y坐标，z轴数据
-
-    p = (get_dis_BS1_BS2_cm()+d1+d2)/200.0;
-    s_m2=sqrt((double)(p*(p-get_dis_BS1_BS2_cm()/100.0)*(p-d1/100.0)*(p-d2/100.0)));
-
-    h_m = s_m2*2/((double)get_dis_BS1_BS2_cm()/100.0);  //三角形高度
-    if(z_m <= 0.5) //与原点没有高度差 
+    uint8_t data_temp;
+    uint8_t data_buff[20] = {0};
+    int i = 0, step = 0, baseSta = 0;
+    for ( i = 0; i < num_cnt; i++)
     {
-        y_m = sqrt(d1*d1/10000.0 - h_m*h_m);
-        x_m = h_m;
+        if(step == 0) data_temp = _port_Lora->read();
+        switch (step)
+        {
+        case 0 :
+            if(data_temp == 0xf4) //双模基站1
+                step = 1;
+            if(data_temp == 0xf7) //双模基站2
+                step = 2;
+            _port_Lora->read(data_buff, 4);
+            break;
+        case 1 :
+            baseSta = BASESTA_B;
+            step = 3;
+            break;
+        case 2 :
+            baseSta = BASESTA_C;
+            step = 3;
+            break;
+        case 3:
+            if(distance_calculate(data_buff, baseSta) == false) return false;  //基站间数据帧尾是否异常
+            uwb_send2baseSta(baseSta);   //返回给基站已接收到距离数据
+            return true;
+            break;
+        default:
+            break;
+        }
     }
-    else{  //有高度差
-        y_m = sqrt(d1*d1/10000.0  - h_m*h_m);
-        x_m = sqrt(h_m*h_m - z_m*z_m);
+    return false;
+}
+
+/**
+ * @brief 发送双模基站测距准备信号
+ * @param num 基站组
+ */
+void AP_UWB::send_range_cmd(int num)
+{
+    if(num == BASESTA_B)
+    {
+        uint8_t data[5] = {0xf3,0x3f,0xff,0xff,0x33};
+        _port_Lora->write(data, 5);
     }
-    //验证是钝角三角形还是锐角三角形,(基站0夹角钝角时需要考虑)直角和基站1钝角可忽略 
-    if (d2 * d2 / 10000.0 >
-        (d1 * d1 / 10000.0 +
-         get_dis_BS1_BS2_cm() * get_dis_BS1_BS2_cm() / 10000.0))
-        y_m = -y_m;
-    _loc_NED.x = x_m;
-    _loc_NED.y = -y_m;
-    _loc_NED.z = z_m;
-    last_frame_ms = AP_HAL::millis();
-    return true;
+    if(num == BASESTA_C)
+    {
+        uint8_t data[5] = {0xf8,0x8f,0xff,0xff,0x88};
+        _port_Lora->write(data, 5);
+    }
 }
 
 /**
@@ -182,15 +222,69 @@ bool AP_UWB::location_calculate(uint8_t* data, int32_t alt) {
  * @return true 
  * @return false 
  */
-bool AP_UWB::distance_calculate(uint8_t* data) {
-    if (*(data + 2) != sterm::BaseStation2Flight) return false;
-
-    uint16_t d = (*data & 0xff) << 8 | (*(data + 1) & 0xff); //基站间距离数据
-    _dis_BS1_BS2_cm = d;
-    set_dis_EN();   //设置已获取基站间数据
-
+bool AP_UWB::distance_calculate(uint8_t* data, int baseSta) {
+    uint8_t flag = 0;
+    if ((baseSta == BASESTA_B && *data == 0x4f && *(data + 3) == 0x44) ||
+        (baseSta == BASESTA_C && *data == 0x7f && *(data + 3) == 0x77))
+        flag = baseSta;
+    uint16_t d = (*(data+1) & 0xff) << 8 | (*(data + 2) & 0xff); //基站间距离数据
+    if(flag == 1) 
+    {
+        _dis_ab = d;
+        _dis_EN_step = 1;
+    } 
+    else if(flag == 2) 
+    {
+        _dis_ac = d;
+        _dis_EN_step = 0;
+        _dis_EN = true;
+    } 
+    else   return false;
     return true;
 }
+
+/**
+ * @brief 发送基站间距离应答消息
+ */
+void AP_UWB::uwb_send2baseSta(int num)
+{
+    if(num == BASESTA_B)
+    {
+        uint8_t tx_buff[5] = {0xf3,0x3f,0,0,0x33};
+        tx_buff[2] = _dis_ab/256;
+        tx_buff[3] = _dis_ab%256;
+        _port_Lora->write(tx_buff, 5);
+    }
+    if(num == BASESTA_C)
+    {
+        uint8_t tx_buff[5] = {0xf8,0x8f,0,0,0x88};
+        tx_buff[2] = _dis_ac/256;
+        tx_buff[3] = _dis_ac%256;
+        _port_Lora->write(tx_buff, 5);
+        uwb_loc.loc_init(_dis_ab, _dis_ac, _dis_bc);
+        // printf("ab:%d,ac:%d,bc:%d\r\n", _dis_ab, _dis_ac, _dis_bc);
+        // printf("temp:%d\r\n", uwb_loc.temp);
+    }
+}
+
+
+// /**
+//  * @brief 位置计算
+//  * 
+//  * @param data 位置原始数据指针
+//  * @param alt 高度
+//  * @return true 
+//  * @return false 
+//  */
+// bool AP_UWB::location_calculate(uint8_t* data, int32_t alt) {
+//     _loc_NED.x = x_m;
+//     _loc_NED.y = -y_m;
+//     _loc_NED.z = z_m;
+//     last_frame_ms = AP_HAL::millis();
+//     return true;
+// }
+
+
 
 /**
  * @brief 发送选用哪一组基站给标签
@@ -208,21 +302,10 @@ void AP_UWB::uwb_send2lable(bool lable)
     {
         tx_buff[2] = 0x01;
     }
-    _port->write(tx_buff, 4);
+    _port_uwb->write(tx_buff, 4);
 }
 
-/**
- * @brief 发送基站间距离应答消息
- * 
- * @param distance_cm 
- */
-void AP_UWB::uwb_send2baseSta(uint16_t distance_cm)
-{
-    uint8_t tx_buff[5] = {0xf3,0x3f,0,0,0x33};
-    tx_buff[2] = distance_cm/256;
-    tx_buff[3] = distance_cm%256;
-    _port_Lora->write(tx_buff, 5);
-}
+
 
 
 //获取相对位置，定义x轴为北，y轴为-东，模拟成北东坐标
@@ -243,16 +326,12 @@ bool AP_UWB::get_relative_position_D_origin(float &posD)
     return true;
 }
 
-void AP_UWB::send_range_cmd()
-{
-    uint8_t data[5] = {0xf3,0x3f,0xff,0xff,0x33};
-    _port_Lora->write(data, 5);
-}
+
 
 //格式化打印
 void AP_UWB::printf(const char *format, ...)
 {
-va_list args;
+  va_list args;
   uint32_t length;
   uint8_t TxBuffer[1024];
   va_start(args, format);

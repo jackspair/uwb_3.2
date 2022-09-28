@@ -113,8 +113,7 @@ const AP_Scheduler::Task Copter::scheduler_tasks[] = {
     SCHED_TASK(rc_loop,              100,    130,  3),
     SCHED_TASK(throttle_loop,         50,     75,  6),
     SCHED_TASK_CLASS(AP_GPS,               &copter.gps,                 update,          50, 200,   9),
-    SCHED_TASK(uwb_update,            20,    200, 10),
-    SCHED_TASK(lora_update,            20,    100, 11),
+    SCHED_TASK(uwb_update,            UWB_Hz, UWB_T, 10),
 #if AP_OPTICALFLOW_ENABLED
     SCHED_TASK_CLASS(OpticalFlow,          &copter.optflow,             update,         200, 160,  12),
 #endif
@@ -763,41 +762,51 @@ bool Copter::get_wp_crosstrack_error_m(float &xtrack_error) const
 
 void Copter::uwb_update()
 {
-    uwb.update(baro_alt);  //传入气压计相对起飞高度
+    uwb.update();
     if (uwb.get_dis_EN() == true )  //基站间距离设置
-    {
-        static int i = 0;
-        if(++i >= 20)
+    { 
+        if(uwb.update(baro_alt) == true)  //传入气压计相对起飞高度
         {
-            i = 0;
-            uwb.printf("\r\nuwb:x:%.2f,y:%.2f,z:%.2f\r\n", uwb.get_location().x, uwb.get_location().y, uwb.get_location().z);
-            Vector3f gps_temp  = inertial_nav.get_position_neu_cm();
-            uwb.printf("gps:x:%.2f,y:%.2f,z:%.2f\r\n", gps_temp.x, gps_temp.y, gps_temp.z);
-            Vector2f temp;
-            float z_temp;
-            if (uwb.get_relative_position_NE_origin(temp) == true)
-            {
-                if(uwb.get_relative_position_D_origin(z_temp) == true)
-                    uwb.printf("home:x:%.2f,y:%.2f,z:%.2f\r\n", temp.x, temp.y, z_temp);
-            }
-        } 
+
+            // static int i = 0;
+            // if(++i >= 20)
+            // {
+            //     i = 0;
+            //     UWB_LOCATION::POINT_POS temp = uwb.get_uwb_loc_pos();
+            //     uwb.printf("x:%d, y:%d, z:%d\r\n", temp.loc.x, temp.loc.y, temp.loc.z);
+            // } 
+            UWB_LOCATION::POINT_POS temp = uwb.get_uwb_loc_pos();
+            uwb.printf("x:%f, y:%f, z:%f\r\n", temp.loc.x, temp.loc.y, temp.loc.z);
+        }
+                //        UWB_LOCATION::POINT_POS temp = uwb.get_uwb_loc_pos();
+                // uwb.printf("x:%d, y:%d, z:%d\r\n", temp.loc.x, temp.loc.y, temp.loc.z);
+            
+    //         uwb.printf("\r\nuwb:x:%.2f,y:%.2f,z:%.2f\r\n", uwb.get_location().x, uwb.get_location().y, uwb.get_location().z);
+    //         Vector3f gps_temp  = inertial_nav.get_position_neu_cm();
+    //         uwb.printf("gps:x:%.2f,y:%.2f,z:%.2f\r\n", gps_temp.x, gps_temp.y, gps_temp.z);
+    //         Vector2f temp;
+    //         float z_temp;
+    //         if (uwb.get_relative_position_NE_origin(temp) == true)
+    //         {
+    //             if(uwb.get_relative_position_D_origin(z_temp) == true)
+    //                 uwb.printf("home:x:%.2f,y:%.2f,z:%.2f\r\n", temp.x, temp.y, z_temp);
+    //         }
+        
     }
     else
     {
         static int n = 0;
-        if(++n >= 20)
+        if(++n >= UWB_Hz)
         {
             n = 0;
-            uwb.send_range_cmd();
+            if(uwb.get_dis_EN_step() == 0)
+                uwb.send_range_cmd(BASESTA_B);
+            if(uwb.get_dis_EN_step() == 1)
+                uwb.send_range_cmd(BASESTA_C);
         }
     }
 }
 
-
-void Copter::lora_update()
-{
-    uwb.update_lora();
-}
 /*
   constructor for main Copter class
  */
