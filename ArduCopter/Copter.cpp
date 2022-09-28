@@ -775,8 +775,9 @@ void Copter::uwb_update()
             //     UWB_LOCATION::POINT_POS temp = uwb.get_uwb_loc_pos();
             //     uwb.printf("x:%d, y:%d, z:%d\r\n", temp.loc.x, temp.loc.y, temp.loc.z);
             // } 
-            UWB_LOCATION::POINT_POS temp = uwb.get_uwb_loc_pos();
-            uwb.printf("x:%f, y:%f, z:%f\r\n", temp.loc.x, temp.loc.y, temp.loc.z);
+
+
+            // uwb.printf("x:%f, y:%f, z:%f\r\n", copter_uwb.loc_cm.x, copter_uwb.loc_cm.y, copter_uwb.loc_cm.z);
         }
                 //        UWB_LOCATION::POINT_POS temp = uwb.get_uwb_loc_pos();
                 // uwb.printf("x:%d, y:%d, z:%d\r\n", temp.loc.x, temp.loc.y, temp.loc.z);

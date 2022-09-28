@@ -18,12 +18,12 @@
 #include <AP_HAL/AP_HAL.h>
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_SerialManager/AP_SerialManager.h>
-#include "UWB_LOCATION.h"
 #define UWB_Hz  20  //uwb刷新数据频率
 #define UWB_T  200  //uwb线程运行最大时间
 #define BASESTA_B 1 //双模基站b
 #define BASESTA_C 2 //c
 
+#include "UWB_PS.h"
 
 class AP_UWB {
 public:
@@ -61,11 +61,11 @@ public:
 
     int get_dis_EN_step() { return _dis_EN_step; }
 
-    UWB_LOCATION::POINT_POS get_uwb_loc_pos() { return uwb_loc.get_n_pos();}
+    // UWB_LOCATION::POINT_POS get_uwb_loc_pos() { return uwb_loc.get_n_pos();}
 
     uint32_t last_frame_ms;
 
-    UWB_LOCATION uwb_loc;
+    // UWB_LOCATION uwb_loc;
 
 private:
     AP_HAL::UARTDriver *_port_uwb;              // UART used to send data to receiver
@@ -99,6 +99,6 @@ private:
     //位置距离计算
     bool location_calculate(uint8_t* data);
 
-    bool update_uwb_loc() { return  uwb_loc.loc_pos(_dis_na_cm, _dis_nb_cm, _dis_nc_cm); }
+    // bool update_uwb_loc() { return  uwb_loc.loc_pos(_dis_na_cm, _dis_nb_cm, _dis_nc_cm); }
 
 };

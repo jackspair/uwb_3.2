@@ -26,15 +26,16 @@
 #define HOME_SET_COUNT 10
 
 #include "AP_UWB.h"
-#include "UWB_LOCATION.h"
 
 #include "string.h"
 #include "stdio.h"
 #include "stdarg.h"
-#define Usqrt(x) sqrt(x)
-#define BC_DIS_CM 800
 
 
+#define BC_DIS_CM 400
+
+extern POINT_POS copter_uwb;
+extern LOC_SYSTEM uwb_PS;
 
 extern const AP_HAL::HAL& hal;
 
@@ -113,12 +114,20 @@ bool AP_UWB::update(int32_t alt) { //高度来源气压计
                 // printf("cx:%d, y:%d, z:%d\r\n", temp.loc.x, temp.loc.y, temp.loc.z);
                 // printf("temp:%d\r\n", uwb_loc.temp);
 
-                if(update_uwb_loc() == true)
+                if(loc_pos(_dis_na_cm, _dis_nb_cm, _dis_nc_cm) == 0)
                 {
-                    printf("temp:%.5f\r\n", uwb_loc.temp);
+                    printf("na:%d,nb:%d,nc:%d\r\n", _dis_na_cm, _dis_nb_cm, _dis_nc_cm);
+
+                    LOC_SYSTEM temp = uwb_PS_get_system();
+                    printf("a:x:%f, y:%f, z:%f\r\n", temp.a.loc_cm.x, temp.a.loc_cm.y, temp.a.loc_cm.z);
+                    printf("b:x:%f, y:%f, z:%f\r\n", temp.b.loc_cm.x, temp.b.loc_cm.y, temp.b.loc_cm.z);
+                    printf("c:x:%f, y:%f, z:%f\r\n", temp.c.loc_cm.x, temp.c.loc_cm.y, temp.c.loc_cm.z);
+                    printf("b1:x:%f, y:%f, z:%f\r\n", temp.b1.loc_cm.x, temp.b1.loc_cm.y, temp.b1.loc_cm.z);
+
+                    printf("x:%f, y:%f, z:%f\r\n", copter_uwb.loc_cm.x, copter_uwb.loc_cm.y, copter_uwb.loc_cm.z);
                     return true;
                 }
-                // printf("na:%d,nb:%d,nc:%d\r\n", _dis_na_cm, _dis_nb_cm, _dis_nc_cm);
+                
                 return false;
             }
             return false;
@@ -261,9 +270,11 @@ void AP_UWB::uwb_send2baseSta(int num)
         tx_buff[2] = _dis_ac/256;
         tx_buff[3] = _dis_ac%256;
         _port_Lora->write(tx_buff, 5);
-        uwb_loc.loc_init(_dis_ab, _dis_ac, _dis_bc);
-        // printf("ab:%d,ac:%d,bc:%d\r\n", _dis_ab, _dis_ac, _dis_bc);
-        // printf("temp:%d\r\n", uwb_loc.temp);
+        if(loc_init(_dis_ab, _dis_ac, _dis_bc) == 0)
+        {
+            printf("ab:%d,ac:%d,bc:%d\r\n", _dis_ab, _dis_ac, _dis_bc);
+            printf("");
+        }
     }
 }
 
