@@ -34,9 +34,6 @@
 
 #define BC_DIS_CM 400
 
-extern POINT_POS copter_uwb;
-extern LOC_SYSTEM uwb_PS;
-
 extern const AP_HAL::HAL& hal;
 
 // constructor
@@ -114,17 +111,21 @@ bool AP_UWB::update(int32_t alt) { //高度来源气压计
                 // printf("cx:%d, y:%d, z:%d\r\n", temp.loc.x, temp.loc.y, temp.loc.z);
                 // printf("temp:%d\r\n", uwb_loc.temp);
 
-                if(loc_pos(_dis_na_cm, _dis_nb_cm, _dis_nc_cm) == 0)
+                if(uwb_PS.loc_pos(_dis_na_cm, _dis_nb_cm, _dis_nc_cm) == 0)
                 {
+                    uint8_t buff[4] = {0x00, 0x10, 0x03, 0x31};
+                    _port_Lora->write(buff, 4);
+                    printf("temp:%f", uwb_PS.temp);
                     printf("na:%d,nb:%d,nc:%d\r\n", _dis_na_cm, _dis_nb_cm, _dis_nc_cm);
 
-                    LOC_SYSTEM temp = uwb_PS_get_system();
-                    printf("a:x:%f, y:%f, z:%f\r\n", temp.a.loc_cm.x, temp.a.loc_cm.y, temp.a.loc_cm.z);
-                    printf("b:x:%f, y:%f, z:%f\r\n", temp.b.loc_cm.x, temp.b.loc_cm.y, temp.b.loc_cm.z);
-                    printf("c:x:%f, y:%f, z:%f\r\n", temp.c.loc_cm.x, temp.c.loc_cm.y, temp.c.loc_cm.z);
-                    printf("b1:x:%f, y:%f, z:%f\r\n", temp.b1.loc_cm.x, temp.b1.loc_cm.y, temp.b1.loc_cm.z);
+                    UWB_PS::LOC_SYSTEM temp = uwb_PS.uwb_PS_get_system();
+                    UWB_PS::POINT_POS copter_uwb = uwb_PS.uwb_PS_get_copter();
+                    printf("a:x:%d, y:%d, z:%d\r\n", temp.a.loc_cm.x, temp.a.loc_cm.y, temp.a.loc_cm.z);
+                    printf("b:x:%d, y:%d, z:%d\r\n", temp.b.loc_cm.x, temp.b.loc_cm.y, temp.b.loc_cm.z);
+                    printf("c:x:%d, y:%d, z:%d\r\n", temp.c.loc_cm.x, temp.c.loc_cm.y, temp.c.loc_cm.z);
+                    printf("b1:x:%d, y:%d, z:%d\r\n", temp.b1.loc_cm.x, temp.b1.loc_cm.y, temp.b1.loc_cm.z);
 
-                    printf("x:%f, y:%f, z:%f\r\n", copter_uwb.loc_cm.x, copter_uwb.loc_cm.y, copter_uwb.loc_cm.z);
+                    printf("x:%d, y:%d, z:%d\r\n", copter_uwb.loc_cm.x, copter_uwb.loc_cm.y, copter_uwb.loc_cm.z);
                     return true;
                 }
                 
@@ -214,13 +215,13 @@ void AP_UWB::send_range_cmd(int num)
 {
     if(num == BASESTA_B)
     {
-        uint8_t data[5] = {0xf3,0x3f,0xff,0xff,0x33};
-        _port_Lora->write(data, 5);
+        uint8_t data[8] = {0x00, 0x01, 0x03, 0xf3,0x3f,0xff,0xff,0x33};
+        _port_Lora->write(data, 8);
     }
     if(num == BASESTA_C)
     {
-        uint8_t data[5] = {0xf8,0x8f,0xff,0xff,0x88};
-        _port_Lora->write(data, 5);
+        uint8_t data[8] = {0x00, 0x02, 0x03, 0xf8,0x8f,0xff,0xff,0x88};
+        _port_Lora->write(data, 8);
     }
 }
 
@@ -259,21 +260,22 @@ void AP_UWB::uwb_send2baseSta(int num)
 {
     if(num == BASESTA_B)
     {
-        uint8_t tx_buff[5] = {0xf3,0x3f,0,0,0x33};
-        tx_buff[2] = _dis_ab/256;
-        tx_buff[3] = _dis_ab%256;
-        _port_Lora->write(tx_buff, 5);
+        uint8_t tx_buff[8] = {0x00, 0x01, 0x03, 0xf3,0x3f,0,0,0x33};
+        tx_buff[5] = _dis_ab/256;
+        tx_buff[6] = _dis_ab%256;
+        _port_Lora->write(tx_buff, 8);
     }
     if(num == BASESTA_C)
     {
-        uint8_t tx_buff[5] = {0xf8,0x8f,0,0,0x88};
-        tx_buff[2] = _dis_ac/256;
-        tx_buff[3] = _dis_ac%256;
-        _port_Lora->write(tx_buff, 5);
-        if(loc_init(_dis_ab, _dis_ac, _dis_bc) == 0)
+        uint8_t tx_buff[8] = {0x00, 0x02, 0x03, 0xf8,0x8f,0,0,0x88};
+        tx_buff[5] = _dis_ac/256;
+        tx_buff[6] = _dis_ac%256;
+        _port_Lora->write(tx_buff, 8);
+        if(uwb_PS.loc_init(_dis_ab, _dis_ac, _dis_bc) == 0)
         {
+            uint8_t buff[] = {0x00,0x10,0x03};
+            _port_Lora->write(buff, 3);
             printf("ab:%d,ac:%d,bc:%d\r\n", _dis_ab, _dis_ac, _dis_bc);
-            printf("");
         }
     }
 }

@@ -66,6 +66,7 @@ public:
     uint32_t last_frame_ms;
 
     // UWB_LOCATION uwb_loc;
+    UWB_PS uwb_PS;
 
 private:
     AP_HAL::UARTDriver *_port_uwb;              // UART used to send data to receiver

@@ -5,7 +5,14 @@
 #ifndef CPP_UWB_PS_H
 #define CPP_UWB_PS_H
 
-//三角形枚举
+class UWB_PS
+{
+private:
+    /* data */
+public:
+    UWB_PS(/* args */);
+
+    //三角形枚举
 typedef enum triangle_type{
     NONE_TRIANGLE = -1,
     ACUTE_Angle = 1,
@@ -60,6 +67,16 @@ double triangle_get_side_m(double hypotenuse_m, double side_m);
 int triangle_get_side_cm(double hypotenuse_m, double side_m);
 double triangle_get_hypotenuse_m(double side1_m, double side2_m);
 int triangle_get_hypotenuse_cm(double side1_m, double side2_m);
-LOC_SYSTEM uwb_PS_get_system();
+
+
+LOC_SYSTEM uwb_PS;
+POINT_POS copter_uwb;
+double temp;
+
+LOC_SYSTEM uwb_PS_get_system() {return uwb_PS; }
+
+POINT_POS uwb_PS_get_copter() {return copter_uwb; }
+
+};
 
 #endif //CPP_UWB_PS_H
