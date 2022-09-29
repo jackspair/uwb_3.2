@@ -5,7 +5,6 @@
 #include "UWB_PS.h"
 #include <AP_HAL/AP_HAL.h>
 #include <stdlib.h>
-#include "uwbSqrt.h"
 
 extern "C"
 {

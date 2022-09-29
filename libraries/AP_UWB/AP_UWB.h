@@ -67,10 +67,13 @@ public:
 
     // UWB_LOCATION uwb_loc;
     UWB_PS uwb_PS;
+    AP_HAL::UARTDriver *_port_Lora;              // UART used to send data to receiver
+        uint32_t _dis_na_cm; //无人机与基站参考点a的距离(基站1)
+    uint32_t _dis_nb_cm; //b(基站2)
+    uint32_t _dis_nc_cm; //c(基站3)
 
 private:
     AP_HAL::UARTDriver *_port_uwb;              // UART used to send data to receiver
-    AP_HAL::UARTDriver *_port_Lora;              // UART used to send data to receiver
 
     
 
@@ -90,9 +93,7 @@ private:
 
     int _dis_EN_step;//坐标系建立步骤
 
-    uint32_t _dis_na_cm; //无人机与基站参考点a的距离(基站1)
-    uint32_t _dis_nb_cm; //b(基站2)
-    uint32_t _dis_nc_cm; //c(基站3)
+
 
     //距离计算
     bool distance_calculate(uint8_t* data, int baseSta);

@@ -764,17 +764,33 @@ void Copter::uwb_update()
 {
     uwb.update();
     if (uwb.get_dis_EN() == true )  //基站间距离设置
-    { 
+    {  
+        // uint8_t buff[] = {0x00,0x10,0x03,0x31,0x32,0x33};
+        // uwb._port_Lora->write(buff, 6);
         if(uwb.update(baro_alt) == true)  //传入气压计相对起飞高度
         {
-
-            // static int i = 0;
-            // if(++i >= 20)
-            // {
-            //     i = 0;
-            //     UWB_LOCATION::POINT_POS temp = uwb.get_uwb_loc_pos();
-            //     uwb.printf("x:%d, y:%d, z:%d\r\n", temp.loc.x, temp.loc.y, temp.loc.z);
-            // } 
+                // uwb.printf("原始数据:a:%d,nb:%d,nc:%d\r\n", uwb._dis_na_cm, uwb._dis_nb_cm, uwb._dis_nc_cm);
+                // UWB_PS::POINT_POS copter_uwb = uwb.uwb_PS.uwb_PS_get_copter();
+                // uwb.printf("位置数据:x:%d, y:%d, z:%d\r\n", copter_uwb.loc_cm.x, copter_uwb.loc_cm.y, copter_uwb.loc_cm.z);
+            static int i = 0;
+            if(++i >= 10)
+            {
+                i = 0;
+                uwb.printf("原始UWB距离数据:a:%d,nb:%d,nc:%d\r\n", uwb._dis_na_cm, uwb._dis_nb_cm, uwb._dis_nc_cm);
+                UWB_PS::POINT_POS copter_uwb = uwb.uwb_PS.uwb_PS_get_copter();
+                uwb.printf("原始位置数据:x:%d, y:%d, z:%d\r\n", copter_uwb.loc_cm.x, copter_uwb.loc_cm.y, copter_uwb.loc_cm.z);
+                // if(uwb.get_home_is_set() == true)
+                // {
+                //     Vector2f NE_temp ;
+                //     uwb.get_relative_position_NE_origin(NE_temp);
+                //     float z_temp;
+                //     uwb.get_relative_position_D_origin(z_temp);
+                //     uwb.printf("北东地位置数据:x:%.2f, y:%.2f, z:%.2f\r\n", NE_temp.x, NE_temp.y, z_temp);
+                // }
+                Vector2f nav_temp = inertial_nav.get_position_xy_cm();
+                float nav_z_temp = inertial_nav.get_position_z_up_cm();
+                uwb.printf("GPS北东地:x:%f, y:%f, z:%f", nav_temp.x, nav_temp.y, nav_z_temp);
+            } 
 
 
             // uwb.printf("x:%f, y:%f, z:%f\r\n", copter_uwb.loc_cm.x, copter_uwb.loc_cm.y, copter_uwb.loc_cm.z);

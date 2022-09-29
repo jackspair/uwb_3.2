@@ -32,7 +32,7 @@
 #include "stdarg.h"
 
 
-#define BC_DIS_CM 400
+#define BC_DIS_CM 150
 
 extern const AP_HAL::HAL& hal;
 
@@ -94,38 +94,47 @@ bool AP_UWB::update(int32_t alt) { //高度来源气压计
             {
                 step = 1;
                 _port_uwb->read(data_buff, 9);
+                // printf((char*)data_buff);
             }
             break;
         case 1:
             if(location_calculate(data_buff) == true)
             {
-                // printf("bool:%d\r\n", uwb_loc.loc_pos(_dis_na_cm, _dis_nb_cm, _dis_nc_cm));
-                // UWB_LOCATION::POINT_POS temp = get_uwb_loc_pos();
-                // printf("x:%d, y:%d, z:%d\r\n", temp.loc.x, temp.loc.y, temp.loc.z);
-
-                // UWB_LOCATION::LOC_POINT temp = uwb_loc.a;
-                // printf("ax:%d, y:%d, z:%d\r\n", temp.loc.x, temp.loc.y, temp.loc.z);
-                // temp = uwb_loc.b1;
-                // printf("bx:%d, y:%d, z:%d\r\n", temp.loc.x, temp.loc.y, temp.loc.z);
-                // temp = uwb_loc.c;
-                // printf("cx:%d, y:%d, z:%d\r\n", temp.loc.x, temp.loc.y, temp.loc.z);
-                // printf("temp:%d\r\n", uwb_loc.temp);
-
+                // printf("na:%d,nb:%d,nc:%d\r\n", _dis_na_cm, _dis_nb_cm, _dis_nc_cm);
                 if(uwb_PS.loc_pos(_dis_na_cm, _dis_nb_cm, _dis_nc_cm) == 0)
                 {
-                    uint8_t buff[4] = {0x00, 0x10, 0x03, 0x31};
-                    _port_Lora->write(buff, 4);
-                    printf("temp:%f", uwb_PS.temp);
-                    printf("na:%d,nb:%d,nc:%d\r\n", _dis_na_cm, _dis_nb_cm, _dis_nc_cm);
+                    
+                    static int x= 0 ,y = 0;
+                    if(_home_is_set == false && ++x >= 10)
+                    {
+                        x= 0;
+                        _home_uwb.x = uwb_PS.copter_uwb.loc_cm.x;
+                        _home_uwb.y = -uwb_PS.copter_uwb.loc_cm.y;
+                        _home_uwb.z = -uwb_PS.copter_uwb.loc_cm.z;
+                        _home_is_set = true;
+                        printf("home is set \r\n");
+                        printf("home:x:%f, y:%f, z:%f\r\n", _home_uwb.x, _home_uwb.y, _home_uwb.z);
+                    }
+                    if(_home_is_set == true && ++y >= 10)
+                    {
+                        y= 0;
+                        UWB_PS::POINT_POS copter_uwb = uwb_PS.uwb_PS_get_copter();
+                        // _loc_NED.x = copter_uwb.loc_cm.x - _home_uwb.x;
+                        // _loc_NED.y = -copter_uwb.loc_cm.y - _home_uwb.y;
+                        // _loc_NED.x = -copter_uwb.loc_cm.z - _home_uwb.z;
+                        printf("北东地位置数据:x:%f, y:%f, z:%f\r\n", copter_uwb.loc_cm.x - _home_uwb.x,-copter_uwb.loc_cm.y - _home_uwb.y, -copter_uwb.loc_cm.z - _home_uwb.z);
+                    }
+                    // printf("na:%d,nb:%d,nc:%d\r\n", _dis_na_cm, _dis_nb_cm, _dis_nc_cm);
+                    // // UWB_PS::LOC_SYSTEM temp = uwb_PS.uwb_PS_get_system();
+                    // UWB_PS::POINT_POS copter_uwb = uwb_PS.uwb_PS_get_copter();
+                    // // printf("a:x:%d, y:%d, z:%d\r\n", temp.a.loc_cm.x, temp.a.loc_cm.y, temp.a.loc_cm.z);
+                    // // printf("b:x:%d, y:%d, z:%d\r\n", temp.b.loc_cm.x, temp.b.loc_cm.y, temp.b.loc_cm.z);
+                    // // printf("c:x:%d, y:%d, z:%d\r\n", temp.c.loc_cm.x, temp.c.loc_cm.y, temp.c.loc_cm.z);
+                    // // printf("b1:x:%d, y:%d, z:%d\r\n", temp.b1.loc_cm.x, temp.b1.loc_cm.y, temp.b1.loc_cm.z);
+                    // // _port_Lora->write(buff, 3);
+                    // printf("true:x:%d, y:%d, z:%d\r\n", copter_uwb.loc_cm.x, copter_uwb.loc_cm.y, copter_uwb.loc_cm.z);
+                    // }
 
-                    UWB_PS::LOC_SYSTEM temp = uwb_PS.uwb_PS_get_system();
-                    UWB_PS::POINT_POS copter_uwb = uwb_PS.uwb_PS_get_copter();
-                    printf("a:x:%d, y:%d, z:%d\r\n", temp.a.loc_cm.x, temp.a.loc_cm.y, temp.a.loc_cm.z);
-                    printf("b:x:%d, y:%d, z:%d\r\n", temp.b.loc_cm.x, temp.b.loc_cm.y, temp.b.loc_cm.z);
-                    printf("c:x:%d, y:%d, z:%d\r\n", temp.c.loc_cm.x, temp.c.loc_cm.y, temp.c.loc_cm.z);
-                    printf("b1:x:%d, y:%d, z:%d\r\n", temp.b1.loc_cm.x, temp.b1.loc_cm.y, temp.b1.loc_cm.z);
-
-                    printf("x:%d, y:%d, z:%d\r\n", copter_uwb.loc_cm.x, copter_uwb.loc_cm.y, copter_uwb.loc_cm.z);
                     return true;
                 }
                 
@@ -273,9 +282,9 @@ void AP_UWB::uwb_send2baseSta(int num)
         _port_Lora->write(tx_buff, 8);
         if(uwb_PS.loc_init(_dis_ab, _dis_ac, _dis_bc) == 0)
         {
-            uint8_t buff[] = {0x00,0x10,0x03};
-            _port_Lora->write(buff, 3);
-            printf("ab:%d,ac:%d,bc:%d\r\n", _dis_ab, _dis_ac, _dis_bc);
+            // uint8_t buff1[] = {0x00,0x10,0x03,0x33,0x32,0x31};
+            // _port_Lora->write(buff1, 6);
+            // printf("ab:%d,ac:%d,bc:%d\r\n", _dis_ab, _dis_ac, _dis_bc);
         }
     }
 }
@@ -318,16 +327,15 @@ void AP_UWB::uwb_send2lable(bool lable)
     _port_uwb->write(tx_buff, 4);
 }
 
-
-
-
 //获取相对位置，定义x轴为北，y轴为-东，模拟成北东坐标
 bool AP_UWB::get_relative_position_NE_origin(Vector2f &posNE)
 {
     if(get_dis_EN() == false)
         return false;
-    posNE.x = _loc_NED.x - _home_uwb.x;
-    posNE.y = _loc_NED.y - _home_uwb.y; //默认前进为x，左边为y，北东是x正轴为北，
+    if(_home_is_set == false)
+        return false;
+    posNE.x = _loc_NED.x;
+    posNE.y = _loc_NED.y; //默认前进为x，左边为y，北东是x正轴为北，
     return true;
 }
 
@@ -335,20 +343,23 @@ bool AP_UWB::get_relative_position_NE_origin(Vector2f &posNE)
 bool AP_UWB::get_relative_position_D_origin(float &posD)
 {
     if (get_dis_EN() == false) return false;
+    if(_home_is_set == false)
+    return false;
     posD = _loc_NED.z;
     return true;
 }
-
-
 
 //格式化打印
 void AP_UWB::printf(const char *format, ...)
 {
   va_list args;
   uint32_t length;
-  uint8_t TxBuffer[1024];
+//   uint8_t TxBuffer[1024];
+  uint8_t TxBuffer[1024] = {0xff,0xff,0x03};
   va_start(args, format);
-  length = vsnprintf((char *)TxBuffer, 1024, (char *)format, args);
+  length = vsnprintf((char *)TxBuffer+3, 1021, (char *)format, args);
   va_end(args);
-  _port_Lora->write(TxBuffer, length);
+//   uint8_t buff[3] = {0x00,0x10,0x03};
+//   _port_Lora->write(buff, 3);
+  _port_Lora->write(TxBuffer, length+3);
 }
