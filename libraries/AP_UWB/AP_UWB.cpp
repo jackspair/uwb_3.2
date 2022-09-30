@@ -335,7 +335,7 @@ bool AP_UWB::get_relative_position_D_origin(float &posD)
     if (get_dis_EN() == false) return false;
     if(_home_is_set == false)
     return false;
-    posD = -uwb_PS.copter_uwb.loc_cm.z - _home_uwb.z;
+    posD = uwb_PS.copter_uwb.loc_cm.z - _home_uwb.z;
     posD = posD/100.0;
     return true;
 }

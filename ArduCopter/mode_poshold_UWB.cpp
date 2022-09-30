@@ -59,7 +59,7 @@ bool ModePosHoldUWB::init(bool ignore_checks)
 
     // initialise wind_comp each time PosHold is switched on
     init_wind_comp_estimate();
-    copter.uwb_pos_EN = true;
+
     return true;
 }
 

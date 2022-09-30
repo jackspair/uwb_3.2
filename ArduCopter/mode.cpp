@@ -29,7 +29,10 @@ Mode::Mode(void) :
 Mode *Copter::mode_from_mode_num(const Mode::Number mode)
 {
     Mode *ret = nullptr;
-
+    if(mode == Mode::Number::ModePosHoldUWB)
+        copter.uwb_pos_EN = true;
+    else
+        copter.uwb_pos_EN = false;
     switch (mode) {
 #if MODE_ACRO_ENABLED == ENABLED
         case Mode::Number::ACRO:
