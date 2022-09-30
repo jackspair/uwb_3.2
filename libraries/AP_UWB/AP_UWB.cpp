@@ -94,17 +94,16 @@ bool AP_UWB::update(int32_t alt) { //高度来源气压计
             {
                 step = 1;
                 _port_uwb->read(data_buff, 9);
-                // printf((char*)data_buff);
             }
             break;
         case 1:
             if(location_calculate(data_buff) == true)
             {
-                // printf("na:%d,nb:%d,nc:%d\r\n", _dis_na_cm, _dis_nb_cm, _dis_nc_cm);
                 if(uwb_PS.loc_pos(_dis_na_cm, _dis_nb_cm, _dis_nc_cm) == 0)
                 {
                     
-                    static int x= 0 ,y = 0;
+                    static int x= 0;
+                    // static int y = 0;
                     if(_home_is_set == false && ++x >= 10)
                     {
                         x= 0;
@@ -115,26 +114,15 @@ bool AP_UWB::update(int32_t alt) { //高度来源气压计
                         printf("home is set \r\n");
                         printf("home:x:%f, y:%f, z:%f\r\n", _home_uwb.x, _home_uwb.y, _home_uwb.z);
                     }
-                    if(_home_is_set == true && ++y >= 10)
-                    {
-                        y= 0;
-                        UWB_PS::POINT_POS copter_uwb = uwb_PS.uwb_PS_get_copter();
-                        // _loc_NED.x = copter_uwb.loc_cm.x - _home_uwb.x;
-                        // _loc_NED.y = -copter_uwb.loc_cm.y - _home_uwb.y;
-                        // _loc_NED.x = -copter_uwb.loc_cm.z - _home_uwb.z;
-                        printf("北东地位置数据:x:%f, y:%f, z:%f\r\n", copter_uwb.loc_cm.x - _home_uwb.x,-copter_uwb.loc_cm.y - _home_uwb.y, -copter_uwb.loc_cm.z - _home_uwb.z);
-                    }
-                    // printf("na:%d,nb:%d,nc:%d\r\n", _dis_na_cm, _dis_nb_cm, _dis_nc_cm);
-                    // // UWB_PS::LOC_SYSTEM temp = uwb_PS.uwb_PS_get_system();
-                    // UWB_PS::POINT_POS copter_uwb = uwb_PS.uwb_PS_get_copter();
-                    // // printf("a:x:%d, y:%d, z:%d\r\n", temp.a.loc_cm.x, temp.a.loc_cm.y, temp.a.loc_cm.z);
-                    // // printf("b:x:%d, y:%d, z:%d\r\n", temp.b.loc_cm.x, temp.b.loc_cm.y, temp.b.loc_cm.z);
-                    // // printf("c:x:%d, y:%d, z:%d\r\n", temp.c.loc_cm.x, temp.c.loc_cm.y, temp.c.loc_cm.z);
-                    // // printf("b1:x:%d, y:%d, z:%d\r\n", temp.b1.loc_cm.x, temp.b1.loc_cm.y, temp.b1.loc_cm.z);
-                    // // _port_Lora->write(buff, 3);
-                    // printf("true:x:%d, y:%d, z:%d\r\n", copter_uwb.loc_cm.x, copter_uwb.loc_cm.y, copter_uwb.loc_cm.z);
+                    // if(_home_is_set == true && ++y >= 10)
+                    // {
+                    //     y= 0;
+                    //     UWB_PS::POINT_POS copter_uwb = uwb_PS.uwb_PS_get_copter();
+                    //     // _loc_NED.x = copter_uwb.loc_cm.x - _home_uwb.x;
+                    //     // _loc_NED.y = -copter_uwb.loc_cm.y - _home_uwb.y;
+                    //     // _loc_NED.x = -copter_uwb.loc_cm.z - _home_uwb.z;
+                    //     printf("北东地位置数据:x:%f, y:%f, z:%f\r\n", copter_uwb.loc_cm.x - _home_uwb.x,-copter_uwb.loc_cm.y - _home_uwb.y, -copter_uwb.loc_cm.z - _home_uwb.z);
                     // }
-
                     return true;
                 }
                 
@@ -334,8 +322,8 @@ bool AP_UWB::get_relative_position_NE_origin(Vector2f &posNE)
         return false;
     if(_home_is_set == false)
         return false;
-    posNE.x = _loc_NED.x;
-    posNE.y = _loc_NED.y; //默认前进为x，左边为y，北东是x正轴为北，
+    posNE.x = uwb_PS.copter_uwb.loc_cm.x - _home_uwb.x;
+    posNE.y = -uwb_PS.copter_uwb.loc_cm.y - _home_uwb.y; //默认前进为x，左边为y，北东是x正轴为北，
     return true;
 }
 
@@ -345,7 +333,7 @@ bool AP_UWB::get_relative_position_D_origin(float &posD)
     if (get_dis_EN() == false) return false;
     if(_home_is_set == false)
     return false;
-    posD = _loc_NED.z;
+    posD = -uwb_PS.copter_uwb.loc_cm.z - _home_uwb.z;
     return true;
 }
 

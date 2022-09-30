@@ -23,9 +23,9 @@ typedef enum triangle_type{
 //厘米距离数据
 typedef struct loc
 {
-    int x;
-    int y;
-    int z;
+    double x;
+    double y;
+    double z;
 }LOC;
 
 //参考坐标点坐标
@@ -62,11 +62,11 @@ TRIANGLE_TYPE is_triangle(unsigned int L1_cm, unsigned int L2_cm, unsigned int L
 double Heron_formula(double L1_m, double L2_m, double L3_m);
 double area_get_high(double S_m2, double w_m);
 double side_get_high_m(double L1_m, double L2_m, double L3_m);
-int side_get_high_cm(double L1_m, double L2_m, double L3_m);
+double side_get_high_cm(double L1_m, double L2_m, double L3_m);
 double triangle_get_side_m(double hypotenuse_m, double side_m);
-int triangle_get_side_cm(double hypotenuse_m, double side_m);
+double triangle_get_side_cm(double hypotenuse_m, double side_m);
 double triangle_get_hypotenuse_m(double side1_m, double side2_m);
-int triangle_get_hypotenuse_cm(double side1_m, double side2_m);
+double triangle_get_hypotenuse_cm(double side1_m, double side2_m);
 
 
 LOC_SYSTEM uwb_PS;
