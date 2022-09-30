@@ -616,6 +616,7 @@ bool RC_Channel_Copter::do_aux_function(const aux_func_t ch_option, const AuxSwi
                 switch (ch_flag) {
             case AuxSwitchPos::LOW:
                 copter.uwb.printf("\r\nLOW\r\n");
+                copter.rc_uwb_ctl();
                 break;
             case AuxSwitchPos::MIDDLE:
                 copter.uwb.printf("\r\nMIDDLE\r\n");

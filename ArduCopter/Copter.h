@@ -313,6 +313,7 @@ private:
     AP_UWB uwb;
     void uwb_update();
     bool uwb_pos_EN;
+    void rc_uwb_ctl();
     // system time in milliseconds of last recorded yaw reset from ekf
     uint32_t ekfYawReset_ms;
     int8_t ekf_primary_core;
@@ -993,7 +994,7 @@ private:
 #if MODE_TURTLE_ENABLED == ENABLED
     ModeTurtle mode_turtle;
 #endif
-
+    ModePosHoldUWB mode_uwb;
     // mode.cpp
     Mode *mode_from_mode_num(const Mode::Number mode);
     void exit_mode(Mode *&old_flightmode, Mode *&new_flightmode);

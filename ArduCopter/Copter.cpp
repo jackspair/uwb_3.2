@@ -822,16 +822,24 @@ void Copter::uwb_update()
     }
 }
 
-Copter::rc_uwb_ctl()
+void Copter::rc_uwb_ctl()
 {
-    if(flightmode.mode_number() == Mode::Number::ModePosHoldUWB)
+    if(flightmode->mode_number() == Mode::Number::ModePosHoldUWB)
     {
         Vector2f NE_temp ;
         uwb.get_relative_position_NE_origin(NE_temp);
         float z_temp;
         uwb.get_relative_position_D_origin(z_temp);
-        uwb.printf("\r\n获取当前位置:x:%.2f, y:%.2f, z:%.2f\r\n", NE_temp.x, NE_temp.y, z_temp);
-        
+        uwb.printf("\r\nUWB获取当前位置:x:%.2f, y:%.2f, z:%.2f\r\n", NE_temp.x, NE_temp.y, z_temp);
+        Vector2p stop_xy;
+        postype_t stop_z;
+        pos_control->get_stopping_point_xy_cm(stop_xy); //获取当前停滞点位置x,y
+        pos_control->get_stopping_point_z_cm(stop_z); //获取当前停滞点位置高度
+        uwb.printf("\r\nNAV获取当前位置:x:%.2f, y:%.2f, z:%.2f\r\n", stop_xy.x, stop_xy.y, stop_z);
+        pos_control->set_pos_target_xy_cm(stop_xy.x+100, stop_xy.y); //设置目标位置（参数为与原点位置差）
+        pos_control->set_pos_target_z_cm(stop_z);
+        pos_control->update_xy_controller();
+        pos_control->update_z_controller();
     }
 }
 

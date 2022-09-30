@@ -323,7 +323,9 @@ bool AP_UWB::get_relative_position_NE_origin(Vector2f &posNE)
     if(_home_is_set == false)
         return false;
     posNE.x = uwb_PS.copter_uwb.loc_cm.x - _home_uwb.x;
+    posNE.x = posNE.x/100.0;
     posNE.y = -uwb_PS.copter_uwb.loc_cm.y - _home_uwb.y; //默认前进为x，左边为y，北东是x正轴为北，
+    posNE.y = posNE.y/100.0;
     return true;
 }
 
@@ -334,6 +336,7 @@ bool AP_UWB::get_relative_position_D_origin(float &posD)
     if(_home_is_set == false)
     return false;
     posD = -uwb_PS.copter_uwb.loc_cm.z - _home_uwb.z;
+    posD = posD/100.0;
     return true;
 }
 
