@@ -4,7 +4,7 @@
 void Copter::read_inertia()
 {
     // inertial altitude estimates. Use barometer climb rate during high vibrations
-    inertial_nav.update(vibration_check.high_vibes, false);
+    inertial_nav.update(vibration_check.high_vibes, uwb_pos_EN);
 
     // pull position from ahrs
     Location loc;

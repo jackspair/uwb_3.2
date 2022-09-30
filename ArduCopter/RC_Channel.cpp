@@ -612,7 +612,19 @@ bool RC_Channel_Copter::do_aux_function(const aux_func_t ch_option, const AuxSwi
                 copter.ap.armed_with_airmode_switch = true;
             }
             break;
-
+        case AUX_FUNC::UWB_CTL:
+                switch (ch_flag) {
+            case AuxSwitchPos::LOW:
+                copter.uwb.printf("\r\nLOW\r\n");
+                break;
+            case AuxSwitchPos::MIDDLE:
+                copter.uwb.printf("\r\nMIDDLE\r\n");
+                break;
+            case AuxSwitchPos::HIGH:
+                copter.uwb.printf("\r\nHIGH\r\n");
+                break;
+            }
+            break;
     default:
         return RC_Channel::do_aux_function(ch_option, ch_flag);
     }

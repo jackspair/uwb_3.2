@@ -822,6 +822,19 @@ void Copter::uwb_update()
     }
 }
 
+Copter::rc_uwb_ctl()
+{
+    if(flightmode.mode_number() == Mode::Number::ModePosHoldUWB)
+    {
+        Vector2f NE_temp ;
+        uwb.get_relative_position_NE_origin(NE_temp);
+        float z_temp;
+        uwb.get_relative_position_D_origin(z_temp);
+        uwb.printf("\r\n获取当前位置:x:%.2f, y:%.2f, z:%.2f\r\n", NE_temp.x, NE_temp.y, z_temp);
+        
+    }
+}
+
 /*
   constructor for main Copter class
  */
@@ -839,6 +852,7 @@ Copter::Copter(void)
     // init sensor error logging flags
     sensor_health.baro = true;
     sensor_health.compass = true;
+    uwb_pos_EN = false;
 }
 
 Copter copter;
