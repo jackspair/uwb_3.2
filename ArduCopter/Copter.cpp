@@ -767,9 +767,7 @@ void Copter::uwb_update()
     {  
         if(uwb.update(baro_alt) == true)  //传入气压计相对起飞高度
         {
-                // uwb.printf("原始数据:a:%d,nb:%d,nc:%d\r\n", uwb._dis_na_cm, uwb._dis_nb_cm, uwb._dis_nc_cm);
-                // UWB_PS::POINT_POS copter_uwb = uwb.uwb_PS.uwb_PS_get_copter();
-                // uwb.printf("位置数据:x:%d, y:%d, z:%d\r\n", copter_uwb.loc_cm.x, copter_uwb.loc_cm.y, copter_uwb.loc_cm.z);
+
             static int i = 0;
             if(++i >= 10)
             {
@@ -789,23 +787,7 @@ void Copter::uwb_update()
                 float nav_z_temp = inertial_nav.get_position_z_up_cm();
                 uwb.printf("\r\n4GPS北东地:x:%f, y:%f, z:%f\r\n", nav_temp.x, nav_temp.y, nav_z_temp);
             } 
-
-
-            // uwb.printf("x:%f, y:%f, z:%f\r\n", copter_uwb.loc_cm.x, copter_uwb.loc_cm.y, copter_uwb.loc_cm.z);
         }
-                //        UWB_LOCATION::POINT_POS temp = uwb.get_uwb_loc_pos();
-                // uwb.printf("x:%d, y:%d, z:%d\r\n", temp.loc.x, temp.loc.y, temp.loc.z);
-            
-    //         uwb.printf("\r\nuwb:x:%.2f,y:%.2f,z:%.2f\r\n", uwb.get_location().x, uwb.get_location().y, uwb.get_location().z);
-    //         Vector3f gps_temp  = inertial_nav.get_position_neu_cm();
-    //         uwb.printf("gps:x:%.2f,y:%.2f,z:%.2f\r\n", gps_temp.x, gps_temp.y, gps_temp.z);
-    //         Vector2f temp;
-    //         float z_temp;
-    //         if (uwb.get_relative_position_NE_origin(temp) == true)
-    //         {
-    //             if(uwb.get_relative_position_D_origin(z_temp) == true)
-    //                 uwb.printf("home:x:%.2f,y:%.2f,z:%.2f\r\n", temp.x, temp.y, z_temp);
-    //         }
         
     }
     else
