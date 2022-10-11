@@ -69,6 +69,7 @@
 #include <AC_Sprayer/AC_Sprayer.h>          // Crop sprayer library
 #include <AP_ADSB/AP_ADSB.h>                // ADS-B RF based collision avoidance module library
 #include <AP_Proximity/AP_Proximity.h>      // ArduPilot proximity sensor library
+#include <AP_UT/AP_UT.h>
 
 // Configuration
 #include "defines.h"
@@ -305,7 +306,7 @@ private:
 
     // Arming/Disarming management class
     AP_Arming_Copter arming;
-
+    AP_UT ut;
     // Optical flow sensor
 #if AP_OPTICALFLOW_ENABLED
     OpticalFlow optflow;

@@ -644,7 +644,7 @@ void Copter::one_hz_loop()
 
     if (ahrs.roll_sensor > -30 && ahrs.roll_sensor < 30 &&
         ahrs.pitch_sensor > -30 && ahrs.pitch_sensor < 30)
-        gcs().send_text(MAV_SEVERITY_CRITICAL, "nav:x:%f,y:%f,z:%f,yaw:%d",
+        gcs().send_text(MAV_SEVERITY_CRITICAL, "nav:x:%f,y:%f,z:%f,yaw:%ld",
                         inertial_nav.get_position_neu_cm().x,
                         inertial_nav.get_position_neu_cm().y,
                         inertial_nav.get_position_neu_cm().z, ahrs.yaw_sensor);
@@ -773,7 +773,7 @@ void Copter::channel_set_home()
     postype_t stop_z;
     pos_control->get_stopping_point_xy_cm(stop_xy); //获取当前停滞点位置x,y
     pos_control->get_stopping_point_z_cm(stop_z); //获取当前停滞点位置高度
-    gcs().send_text(MAV_SEVERITY_CRITICAL,"x:%f,y:%f,z:%f,yaw:%d", stop_xy.x, stop_xy.y, stop_z, ahrs.yaw_sensor);
+    gcs().send_text(MAV_SEVERITY_CRITICAL,"x:%f,y:%f,z:%f,yaw:%ld", stop_xy.x, stop_xy.y, stop_z, ahrs.yaw_sensor);
     pos_control->set_pos_target_xy_cm(stop_xy.x - 100, stop_xy.y - 100); //设置目标位置（参数为与原点位置差）
     pos_control->set_pos_target_z_cm(stop_z + 100);
     pos_control->update_xy_controller();

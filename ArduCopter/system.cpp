@@ -52,6 +52,8 @@ void Copter::init_ardupilot()
     
     barometer.init();
 
+    ut.init(serial_manager);
+
     // setup telem slots with serial ports
     gcs().setup_uarts();
 
