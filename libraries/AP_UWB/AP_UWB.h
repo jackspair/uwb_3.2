@@ -72,6 +72,8 @@ public:
     uint32_t _dis_nb_cm; //b(»ùÕ¾2)
     uint32_t _dis_nc_cm; //c(»ùÕ¾3)
 
+    void reset_uwb_system();
+
 private:
     AP_HAL::UARTDriver *_port_uwb;              // UART used to send data to receiver
 

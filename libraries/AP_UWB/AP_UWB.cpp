@@ -41,6 +41,11 @@ AP_UWB::AP_UWB(void) {
     _port_uwb = NULL;
     _port_Lora = NULL;
 
+    reset_uwb_system();
+}
+
+void AP_UWB::reset_uwb_system()
+{
     _dis_ab = 0;
     _dis_ac = 0;
     _dis_bc = BC_DIS_CM;
@@ -49,6 +54,7 @@ AP_UWB::AP_UWB(void) {
     _home_is_set = false;
     _dis_EN_step = 0;
     last_frame_ms = 0;
+    uwb_PS.uwb_PS = {0};
 }
 
 void AP_UWB::init(const AP_SerialManager& serial_manager) {
@@ -179,10 +185,20 @@ bool AP_UWB::update()
         {
         case 0 :
             if(data_temp == 0xf4) //双模基站1
+            {
                 step = 1;
-            if(data_temp == 0xf7) //双模基站2
+                _port_Lora->read(data_buff, 4);
+            }   
+            if(data_temp == 0xf7) //双模基站2 
+            {
                 step = 2;
-            _port_Lora->read(data_buff, 4);
+                _port_Lora->read(data_buff, 4);
+            }
+            if(data_temp == 0xf9)
+            {
+                _port_Lora->read(data_buff,3);
+                step = 4;
+            }
             break;
         case 1 :
             baseSta = BASESTA_B;
@@ -195,6 +211,15 @@ bool AP_UWB::update()
         case 3:
             if(distance_calculate(data_buff, baseSta) == false) return false;  //基站间数据帧尾是否异常
             uwb_send2baseSta(baseSta);   //返回给基站已接收到距离数据
+            return true;
+            break;
+        case 4 :
+            if(data_buff[0] == 0x9f && data_buff[1] == 0xff && data_buff[2] == 0x99)
+            {
+                uint8_t rst_buff[4] = {0xf9, 0x9f, 0xff, 0x99};
+                _port_uwb->write(rst_buff, 4);
+                reset_uwb_system();
+            }
             return true;
             break;
         default:

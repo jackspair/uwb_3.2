@@ -12,7 +12,7 @@ extern "C"
 }
 
 
-#define uwbSqrt(x)  rsqrt(x)
+#define uwbSqrt(x)  sqrt(x)
 
 UWB_PS::UWB_PS(/* args */)
 {
