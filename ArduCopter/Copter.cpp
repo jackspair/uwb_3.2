@@ -783,9 +783,9 @@ void Copter::uwb_update()
                     uwb.get_relative_position_D_origin(z_temp);
                     uwb.printf("\r\n3北东地位置数据:x:%.2f, y:%.2f, z:%.2f\r\n", NE_temp.x, NE_temp.y, z_temp);
                 }
-                Vector2f nav_temp = inertial_nav.get_position_xy_cm();
-                float nav_z_temp = inertial_nav.get_position_z_up_cm();
-                uwb.printf("\r\n4GPS北东地:x:%f, y:%f, z:%f\r\n", nav_temp.x, nav_temp.y, nav_z_temp);
+                // Vector2f nav_temp = inertial_nav.get_position_xy_cm();
+                // float nav_z_temp = inertial_nav.get_position_z_up_cm();
+                // uwb.printf("\r\n4GPS北东地:x:%f, y:%f, z:%f\r\n", nav_temp.x, nav_temp.y, nav_z_temp);
             } 
         }
         

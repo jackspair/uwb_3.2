@@ -117,8 +117,8 @@ bool AP_UWB::update(int32_t alt) { //高度来源气压计
                         _home_uwb.y = -uwb_PS.copter_uwb.loc_cm.y;
                         _home_uwb.z = -uwb_PS.copter_uwb.loc_cm.z;
                         _home_is_set = true;
-                        printf("home is set \r\n");
-                        printf("home:x:%f, y:%f, z:%f\r\n", _home_uwb.x, _home_uwb.y, _home_uwb.z);
+                        printf("-------home is set -----------\r\n");
+                        printf("-------home:x:%f, y:%f, z:%f-----------\r\n", _home_uwb.x, _home_uwb.y, _home_uwb.z);
                     }
                     // if(_home_is_set == true && ++y >= 10)
                     // {
@@ -130,6 +130,10 @@ bool AP_UWB::update(int32_t alt) { //高度来源气压计
                     //     printf("北东地位置数据:x:%f, y:%f, z:%f\r\n", copter_uwb.loc_cm.x - _home_uwb.x,-copter_uwb.loc_cm.y - _home_uwb.y, -copter_uwb.loc_cm.z - _home_uwb.z);
                     // }
                     return true;
+                }
+                else
+                {
+                    printf("\r\n-----------uwb_location failure  dis_a:%d, dis_b:%d, dis_c:%d---------\r\n",_dis_na_cm, _dis_nb_cm, _dis_nc_cm);
                 }
                 
                 return false;
@@ -216,9 +220,7 @@ bool AP_UWB::update()
         case 4 :
             if(data_buff[0] == 0x9f && data_buff[1] == 0xff && data_buff[2] == 0x99)
             {
-                uint8_t rst_buff[4] = {0xf9, 0x9f, 0xff, 0x99};
-                _port_uwb->write(rst_buff, 4);
-                reset_uwb_system();
+                rst_uwb();
             }
             return true;
             break;
@@ -295,9 +297,17 @@ void AP_UWB::uwb_send2baseSta(int num)
         _port_Lora->write(tx_buff, 8);
         if(uwb_PS.loc_init(_dis_ab, _dis_ac, _dis_bc) == 0)
         {
+            uint8_t start_lable_buff[4] = {0xf5, 0x5f, 0xff, 0x55};
+            _port_uwb->write(start_lable_buff, 4);
+            printf("\r\n----------UWB_SYS_init succeed---------------\r\n");
             // uint8_t buff1[] = {0x00,0x10,0x03,0x33,0x32,0x31};
             // _port_Lora->write(buff1, 6);
             // printf("ab:%d,ac:%d,bc:%d\r\n", _dis_ab, _dis_ac, _dis_bc);
+        }
+        else
+        {
+            printf("\r\n--------------UWB_SYS_init failure, ab:%d, ac:%d, bc:%d\r\n", _dis_ab, _dis_ac, _dis_bc);
+            rst_uwb();
         }
     }
 }
