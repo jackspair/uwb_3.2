@@ -104,9 +104,6 @@ private:
     bool location_calculate(uint8_t* data);
 
     // bool update_uwb_loc() { return  uwb_loc.loc_pos(_dis_na_cm, _dis_nb_cm, _dis_nc_cm); }
-    void rst_uwb() {
-        uint8_t rst_buff[4] = {0xf9, 0x9f, 0xff, 0x99};
-        _port_uwb->write(rst_buff, 4);
-        reset_uwb_system();};
+    void rst_uwb();
 
 };

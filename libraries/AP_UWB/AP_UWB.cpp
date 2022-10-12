@@ -57,6 +57,16 @@ void AP_UWB::reset_uwb_system()
     uwb_PS.uwb_PS = {0};
 }
 
+void AP_UWB::rst_uwb() 
+{
+    uint8_t rst_buff[7] = {0x00, 0x01, 0x03, 0xf9, 0x9f, 0xff, 0x99};
+    _port_uwb->write(rst_buff+3, 4);
+    _port_Lora->write(rst_buff, 7);
+    rst_buff[1] = 0x02;
+    _port_Lora->write(rst_buff, 7);
+    reset_uwb_system();
+}
+
 void AP_UWB::init(const AP_SerialManager& serial_manager) {
     // check for DEVO_DPort
     if ((_port_uwb = serial_manager.find_serial(
