@@ -127,8 +127,8 @@ bool AP_UWB::update(int32_t alt) { //高度来源气压计
                         _home_uwb.y = -uwb_PS.copter_uwb.loc_cm.y;
                         _home_uwb.z = -uwb_PS.copter_uwb.loc_cm.z;
                         _home_is_set = true;
-                        printf("-------home is set -----------\r\n");
-                        printf("-------home:x:%f, y:%f, z:%f-----------\r\n", _home_uwb.x, _home_uwb.y, _home_uwb.z);
+                        printf("-------home is set -----------\r\n
+                                -------home:x:%f, y:%f, z:%f-----------\r\n", _home_uwb.x, _home_uwb.y, _home_uwb.z);
                     }
                     // if(_home_is_set == true && ++y >= 10)
                     // {

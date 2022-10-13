@@ -772,16 +772,18 @@ void Copter::uwb_update()
             if(++i >= 10)
             {
                 i = 0;
-                uwb.printf("\r\n1原始UWB距离数据:a:%d,nb:%d,nc:%d\r\n", uwb._dis_na_cm, uwb._dis_nb_cm, uwb._dis_nc_cm);
                 UWB_PS::POINT_POS copter_uwb = uwb.uwb_PS.uwb_PS_get_copter();
-                uwb.printf("\r\n2原始位置数据:x:%f, y:%f, z:%f\r\n", copter_uwb.loc_cm.x, copter_uwb.loc_cm.y, copter_uwb.loc_cm.z);
+                uwb.printf("\r\n---------1原始UWB距离数据:a:%d,nb:%d,nc:%d---------\r\n
+                \r\n---------2原始位置数据:x:%f,y:%f,z:%f----------\r\n", 
+                uwb._dis_na_cm, uwb._dis_nb_cm, uwb._dis_nc_cm, 
+                copter_uwb.loc_cm.x, copter_uwb.loc_cm.y, copter_uwb.loc_cm.z);
                 if(uwb.get_home_is_set() == true)
                 {
                     Vector2f NE_temp ;
                     uwb.get_relative_position_NE_origin(NE_temp);
                     float z_temp;
                     uwb.get_relative_position_D_origin(z_temp);
-                    uwb.printf("\r\n3北东地位置数据:x:%.2f, y:%.2f, z:%.2f\r\n", NE_temp.x, NE_temp.y, z_temp);
+                    uwb.printf("\r\n--------3北东地位置数据:x:%.2f,y:%.2f,z:%.2f-----------\r\n", NE_temp.x, NE_temp.y, z_temp);
                 }
                 // Vector2f nav_temp = inertial_nav.get_position_xy_cm();
                 // float nav_z_temp = inertial_nav.get_position_z_up_cm();
