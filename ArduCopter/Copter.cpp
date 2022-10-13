@@ -773,7 +773,7 @@ void Copter::uwb_update()
             {
                 i = 0;
                 UWB_PS::POINT_POS copter_uwb = uwb.uwb_PS.uwb_PS_get_copter();
-                uwb.printf("\r\n---------1原始UWB距离数据:a:%d,nb:%d,nc:%d---------\r\n
+                uwb.printf("\r\n---------1原始UWB距离数据:a:%d,nb:%d,nc:%d---------\r\n\
                 \r\n---------2原始位置数据:x:%f,y:%f,z:%f----------\r\n", 
                 uwb._dis_na_cm, uwb._dis_nb_cm, uwb._dis_nc_cm, 
                 copter_uwb.loc_cm.x, copter_uwb.loc_cm.y, copter_uwb.loc_cm.z);
