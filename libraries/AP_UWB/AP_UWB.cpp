@@ -128,7 +128,7 @@ bool AP_UWB::update(int32_t alt) { //高度来源气压计
                         _home_uwb.z = -uwb_PS.copter_uwb.loc_cm.z;
                         _home_is_set = true;
                         printf("-------home is set -----------\r\n\
-                                -------home:x:%f, y:%f, z:%f-----------\r\n", _home_uwb.x, _home_uwb.y, _home_uwb.z);
+-------home:x:%f, y:%f, z:%f-----------\r\n", _home_uwb.x, _home_uwb.y, _home_uwb.z);
                     }
                     // if(_home_is_set == true && ++y >= 10)
                     // {
@@ -143,7 +143,7 @@ bool AP_UWB::update(int32_t alt) { //高度来源气压计
                 }
                 else
                 {
-                    printf("\r\n-----------uwb_location failure  dis_a:%d, dis_b:%d, dis_c:%d---------\r\n",_dis_na_cm, _dis_nb_cm, _dis_nc_cm);
+                    printf("-----------uwb_location failure  dis_a:%d, dis_b:%d, dis_c:%d---------\r\n",_dis_na_cm, _dis_nb_cm, _dis_nc_cm);
                 }
                 
                 return false;
