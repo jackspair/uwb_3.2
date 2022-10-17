@@ -91,6 +91,7 @@ void AP_UWB::init(const AP_SerialManager& serial_manager) {
  * @return false 
  */
 bool AP_UWB::update(int32_t alt) { //�߶���Դ��ѹ��
+    UWB_TO_NE(1,3); 
     if (_port_uwb == NULL) return false;
 
     uint16_t num_cnt = _port_uwb->available();  //��ȡ����������

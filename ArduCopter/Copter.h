@@ -172,6 +172,8 @@
 
 #include "mode.h"
 
+#define pi       3.1415926
+
 class Copter : public AP_Vehicle {
 public:
     friend class GCS_MAVLINK_Copter;

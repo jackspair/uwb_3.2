@@ -74,6 +74,7 @@ public:
     uint32_t _dis_nc_cm; //c(��վ3)
 
     void reset_uwb_system();
+    void UWB_TO_NE(float x,float y);
 
 private:
     AP_HAL::UARTDriver *_port_uwb;              // UART used to send data to receiver
