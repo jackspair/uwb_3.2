@@ -84,16 +84,16 @@ void AP_UWB::init(const AP_SerialManager& serial_manager) {
 }
 
 /**
- * @brief UWBÊý¾Ý¸üÐÂ
+ * @brief UWBï¿½ï¿½ï¿½Ý¸ï¿½ï¿½ï¿½
  * 
- * @param alt ¸ß¶ÈÊý¾ÝÀ´Ô´
+ * @param alt ï¿½ß¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ô´
  * @return true 
  * @return false 
  */
-bool AP_UWB::update(int32_t alt) { //¸ß¶ÈÀ´Ô´ÆøÑ¹¼Æ
+bool AP_UWB::update(int32_t alt) { //ï¿½ß¶ï¿½ï¿½ï¿½Ô´ï¿½ï¿½Ñ¹ï¿½ï¿½
     if (_port_uwb == NULL) return false;
 
-    uint16_t num_cnt = _port_uwb->available();  //¶ÁÈ¡»º´æÇøÊý¾Ý
+    uint16_t num_cnt = _port_uwb->available();  //ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     if (num_cnt == 0)  return false;
 
     if (_dis_EN == false)   return false;
@@ -137,7 +137,7 @@ bool AP_UWB::update(int32_t alt) { //¸ß¶ÈÀ´Ô´ÆøÑ¹¼Æ
                     //     // _loc_NED.x = copter_uwb.loc_cm.x - _home_uwb.x;
                     //     // _loc_NED.y = -copter_uwb.loc_cm.y - _home_uwb.y;
                     //     // _loc_NED.x = -copter_uwb.loc_cm.z - _home_uwb.z;
-                    //     printf("±±¶«µØÎ»ÖÃÊý¾Ý:x:%f, y:%f, z:%f\r\n", copter_uwb.loc_cm.x - _home_uwb.x,-copter_uwb.loc_cm.y - _home_uwb.y, -copter_uwb.loc_cm.z - _home_uwb.z);
+                    //     printf("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½:x:%f, y:%f, z:%f\r\n", copter_uwb.loc_cm.x - _home_uwb.x,-copter_uwb.loc_cm.y - _home_uwb.y, -copter_uwb.loc_cm.z - _home_uwb.z);
                     // }
                     return true;
                 }
@@ -158,7 +158,7 @@ bool AP_UWB::update(int32_t alt) { //¸ß¶ÈÀ´Ô´ÆøÑ¹¼Æ
 }
 
 /**
- * @brief ×ø±êÏµ½¨Á¢ºó»ùÕ¾abcÓëÎÞÈË»úËùÔÚµãµÄ¾àÀëÊý¾Ý´¦Àí
+ * @brief ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Õ¾abcï¿½ï¿½ï¿½ï¿½ï¿½Ë»ï¿½ï¿½ï¿½ï¿½Úµï¿½Ä¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ý´ï¿½ï¿½ï¿½
  * 
  * @param data 
  * @return true 
@@ -177,7 +177,7 @@ bool AP_UWB::location_calculate(uint8_t* data)
 }
 
 /**
- * @brief ¸üÐÂloraÐ­ÒéÊý¾Ý
+ * @brief ï¿½ï¿½ï¿½ï¿½loraÐ­ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
  * 
  * @return true 
  * @return false 
@@ -186,7 +186,7 @@ bool AP_UWB::update()
 { 
     if (_port_Lora == NULL) return false;
 
-    uint16_t num_cnt = _port_Lora->available();  //¶ÁÈ¡»º´æÇøÊý¾Ý
+    uint16_t num_cnt = _port_Lora->available();  //ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     if (num_cnt == 0)  return false;
 
     uint8_t data_temp;
@@ -198,12 +198,12 @@ bool AP_UWB::update()
         switch (step)
         {
         case 0 :
-            if(data_temp == 0xf4) //Ë«Ä£»ùÕ¾1
+            if(data_temp == 0xf4) //Ë«Ä£ï¿½ï¿½Õ¾1
             {
                 step = 1;
                 _port_Lora->read(data_buff, 4);
             }   
-            if(data_temp == 0xf7) //Ë«Ä£»ùÕ¾2 
+            if(data_temp == 0xf7) //Ë«Ä£ï¿½ï¿½Õ¾2 
             {
                 step = 2;
                 _port_Lora->read(data_buff, 4);
@@ -223,8 +223,8 @@ bool AP_UWB::update()
             step = 3;
             break;
         case 3:
-            if(distance_calculate(data_buff, baseSta) == false) return false;  //»ùÕ¾¼äÊý¾ÝÖ¡Î²ÊÇ·ñÒì³£
-            uwb_send2baseSta(baseSta);   //·µ»Ø¸ø»ùÕ¾ÒÑ½ÓÊÕµ½¾àÀëÊý¾Ý
+            if(distance_calculate(data_buff, baseSta) == false) return false;  //ï¿½ï¿½Õ¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¡Î²ï¿½Ç·ï¿½ï¿½ì³£
+            uwb_send2baseSta(baseSta);   //ï¿½ï¿½ï¿½Ø¸ï¿½ï¿½ï¿½Õ¾ï¿½Ñ½ï¿½ï¿½Õµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             return true;
             break;
         case 4 :
@@ -242,8 +242,8 @@ bool AP_UWB::update()
 }
 
 /**
- * @brief ·¢ËÍË«Ä£»ùÕ¾²â¾à×¼±¸ÐÅºÅ
- * @param num »ùÕ¾×é
+ * @brief ï¿½ï¿½ï¿½ï¿½Ë«Ä£ï¿½ï¿½Õ¾ï¿½ï¿½ï¿½×¼ï¿½ï¿½ï¿½Åºï¿½
+ * @param num ï¿½ï¿½Õ¾ï¿½ï¿½
  */
 void AP_UWB::send_range_cmd(int num)
 {
@@ -260,9 +260,9 @@ void AP_UWB::send_range_cmd(int num)
 }
 
 /**
- * @brief »ùÕ¾¼ä¾àÀëÑéÖ¤
+ * @brief ï¿½ï¿½Õ¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¤
  * 
- * @param data »ùÕ¾¾àÀëÊý¾ÝÖ¸Õë
+ * @param data ï¿½ï¿½Õ¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½
  * @return true 
  * @return false 
  */
@@ -271,7 +271,7 @@ bool AP_UWB::distance_calculate(uint8_t* data, int baseSta) {
     if ((baseSta == BASESTA_B && *data == 0x4f && *(data + 3) == 0x44) ||
         (baseSta == BASESTA_C && *data == 0x7f && *(data + 3) == 0x77))
         flag = baseSta;
-    uint16_t d = (*(data+1) & 0xff) << 8 | (*(data + 2) & 0xff); //»ùÕ¾¼ä¾àÀëÊý¾Ý
+    uint16_t d = (*(data+1) & 0xff) << 8 | (*(data + 2) & 0xff); //ï¿½ï¿½Õ¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     if(flag == 1) 
     {
         _dis_ab = d;
@@ -288,7 +288,7 @@ bool AP_UWB::distance_calculate(uint8_t* data, int baseSta) {
 }
 
 /**
- * @brief ·¢ËÍ»ùÕ¾¼ä¾àÀëÓ¦´ðÏûÏ¢
+ * @brief ï¿½ï¿½ï¿½Í»ï¿½Õ¾ï¿½ï¿½ï¿½ï¿½ï¿½Ó¦ï¿½ï¿½ï¿½ï¿½Ï¢
  */
 void AP_UWB::uwb_send2baseSta(int num)
 {
@@ -324,10 +324,10 @@ void AP_UWB::uwb_send2baseSta(int num)
 
 
 // /**
-//  * @brief Î»ÖÃ¼ÆËã
+//  * @brief Î»ï¿½Ã¼ï¿½ï¿½ï¿½
 //  * 
-//  * @param data Î»ÖÃÔ­Ê¼Êý¾ÝÖ¸Õë
-//  * @param alt ¸ß¶È
+//  * @param data Î»ï¿½ï¿½Ô­Ê¼ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½
+//  * @param alt ï¿½ß¶ï¿½
 //  * @return true 
 //  * @return false 
 //  */
@@ -342,7 +342,7 @@ void AP_UWB::uwb_send2baseSta(int num)
 
 
 /**
- * @brief ·¢ËÍÑ¡ÓÃÄÄÒ»×é»ùÕ¾¸ø±êÇ©
+ * @brief ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Õ¾ï¿½ï¿½ï¿½ï¿½Ç©
  * 
  * @param lable 
  */
@@ -360,7 +360,7 @@ void AP_UWB::uwb_send2lable(bool lable)
     _port_uwb->write(tx_buff, 4);
 }
 
-//»ñÈ¡Ïà¶ÔÎ»ÖÃ£¬¶¨ÒåxÖáÎª±±£¬yÖáÎª-¶«£¬Ä£Äâ³É±±¶«×ø±ê
+//ï¿½ï¿½È¡ï¿½ï¿½ï¿½Î»ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½xï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½yï¿½ï¿½Îª-ï¿½ï¿½ï¿½ï¿½Ä£ï¿½ï¿½É±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 bool AP_UWB::get_relative_position_NE_origin(Vector2f &posNE)
 {
     if(get_dis_EN() == false)
@@ -369,12 +369,12 @@ bool AP_UWB::get_relative_position_NE_origin(Vector2f &posNE)
         return false;
     posNE.x = uwb_PS.copter_uwb.loc_cm.x - _home_uwb.x;
     posNE.x = posNE.x/100.0;
-    posNE.y = -uwb_PS.copter_uwb.loc_cm.y - _home_uwb.y; //Ä¬ÈÏÇ°½øÎªx£¬×ó±ßÎªy£¬±±¶«ÊÇxÕýÖáÎª±±£¬
+    posNE.y = -uwb_PS.copter_uwb.loc_cm.y - _home_uwb.y; //Ä¬ï¿½ï¿½Ç°ï¿½ï¿½Îªxï¿½ï¿½ï¿½ï¿½ï¿½Îªyï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½xï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½
     posNE.y = posNE.y/100.0;
     return true;
 }
 
-//»ñÈ¡zÖá
+//ï¿½ï¿½È¡zï¿½ï¿½
 bool AP_UWB::get_relative_position_D_origin(float &posD)
 {
     if (get_dis_EN() == false) return false;
@@ -385,7 +385,7 @@ bool AP_UWB::get_relative_position_D_origin(float &posD)
     return true;
 }
 
-//¸ñÊ½»¯´òÓ¡
+//ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½Ó¡
 void AP_UWB::printf(const char *format, ...)
 {
   va_list args;

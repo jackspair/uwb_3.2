@@ -18,9 +18,10 @@
 #include <AP_HAL/AP_HAL.h>
 #include <AP_AHRS/AP_AHRS.h>
 #include <AP_SerialManager/AP_SerialManager.h>
-#define UWB_Hz  20  //uwbË¢ÐÂÊý¾ÝÆµÂÊ
-#define UWB_T  200  //uwbÏß³ÌÔËÐÐ×î´óÊ±¼ä
-#define BASESTA_B 1 //Ë«Ä£»ùÕ¾b
+
+#define UWB_Hz  20  //uwbË¢ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æµï¿½ï¿½
+#define UWB_T  200  //uwbï¿½ß³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
+#define BASESTA_B 1 //Ë«Ä£ï¿½ï¿½Õ¾b
 #define BASESTA_C 2 //c
 
 #include "UWB_PS.h"
@@ -32,30 +33,30 @@ public:
     AP_UWB(const AP_UWB &other) = delete;
     AP_UWB &operator=(const AP_UWB&) = delete;
 
-    //³õÊ¼»¯UWB´®¿Ú
+    //ï¿½ï¿½Ê¼ï¿½ï¿½UWBï¿½ï¿½ï¿½ï¿½
     void init(const AP_SerialManager& serial_manager); 
-    //»ñÈ¡×ø±êÏµÊÇ·ñ½¨Á¢
+    //ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½Ïµï¿½Ç·ï¿½ï¿½ï¿½
     bool get_dis_EN() {return _dis_EN;}
-    //ÉèÖÃµ±Ç°Î»ÖÃÎª¼ÒÎ»ÖÃ
+    //ï¿½ï¿½ï¿½Ãµï¿½Ç°Î»ï¿½ï¿½Îªï¿½ï¿½Î»ï¿½ï¿½
     void set_home_is_set() {_home_is_set = true; _home_uwb = _location;}
-    //»ñÈ¡¼ÒÎ»ÖÃÊÇ·ñÉèÖÃ
+    //ï¿½ï¿½È¡ï¿½ï¿½Î»ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½
     bool get_home_is_set() {return _home_is_set;}
     Vector3f get_home() {return _home_uwb;}
-    //¸üÐÂUWB ±êÇ©Êý¾Ý
+    //ï¿½ï¿½ï¿½ï¿½UWB ï¿½ï¿½Ç©ï¿½ï¿½ï¿½ï¿½
     bool update(int32_t alt); 
-    //¸üÐÂUWB LoRaÊý¾Ý
+    //ï¿½ï¿½ï¿½ï¿½UWB LoRaï¿½ï¿½ï¿½ï¿½
     bool update(); 
-    //·¢ËÍ¸ø±êÇ©µ½´ïÖ¸¶¨Î»ÖÃ£¬ÇÐ»»¶¨Î»»ùÕ¾
+    //ï¿½ï¿½ï¿½Í¸ï¿½ï¿½ï¿½Ç©ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Î»ï¿½Ã£ï¿½ï¿½Ð»ï¿½ï¿½ï¿½Î»ï¿½ï¿½Õ¾
     void uwb_send2lable(bool lable);
-    //·¢ËÍ»ùÕ¾ÒÑ»ñÈ¡¶¨Î»Êý¾Ý
+    //ï¿½ï¿½ï¿½Í»ï¿½Õ¾ï¿½Ñ»ï¿½È¡ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½
     void uwb_send2baseSta(int num);
-    //»ñÈ¡Ïà¶ÔÎ»ÖÃNE×ø±ê
+    //ï¿½ï¿½È¡ï¿½ï¿½ï¿½Î»ï¿½ï¿½NEï¿½ï¿½ï¿½ï¿½
     bool get_relative_position_NE_origin(Vector2f &posNE) ;
-    //»ñÈ¡Ïà¶ÔÎ»ÖÃD×ø±ê
+    //ï¿½ï¿½È¡ï¿½ï¿½ï¿½Î»ï¿½ï¿½Dï¿½ï¿½ï¿½ï¿½
     bool get_relative_position_D_origin(float &posD) ;
-    //·¢ËÍ¸ø»ùÕ¾²â¾àÐÅÏ¢
+    //ï¿½ï¿½ï¿½Í¸ï¿½ï¿½ï¿½Õ¾ï¿½ï¿½ï¿½ï¿½ï¿½Ï¢
     void send_range_cmd(int num);
-    //¸ñÊ½»¯Êä³ö
+    //ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ï¿½
     void printf(const char *format, ...);
     void print(const char* str) {_port_uwb->write(str);} 
 
@@ -68,9 +69,9 @@ public:
     // UWB_LOCATION uwb_loc;
     UWB_PS uwb_PS;
     AP_HAL::UARTDriver *_port_Lora;              // UART used to send data to receiver
-        uint32_t _dis_na_cm; //ÎÞÈË»úÓë»ùÕ¾²Î¿¼µãaµÄ¾àÀë(»ùÕ¾1)
-    uint32_t _dis_nb_cm; //b(»ùÕ¾2)
-    uint32_t _dis_nc_cm; //c(»ùÕ¾3)
+        uint32_t _dis_na_cm; //ï¿½ï¿½ï¿½Ë»ï¿½ï¿½ï¿½ï¿½Õ¾ï¿½Î¿ï¿½ï¿½ï¿½aï¿½Ä¾ï¿½ï¿½ï¿½(ï¿½ï¿½Õ¾1)
+    uint32_t _dis_nb_cm; //b(ï¿½ï¿½Õ¾2)
+    uint32_t _dis_nc_cm; //c(ï¿½ï¿½Õ¾3)
 
     void reset_uwb_system();
 
@@ -79,28 +80,28 @@ private:
 
     
 
-    Vector3f _loc_NED;//µ±Ç°Î»ÖÃ±±¶«µØ×ø±ê
+    Vector3f _loc_NED;//ï¿½ï¿½Ç°Î»ï¿½Ã±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-    Vector3f _location;//µ±Ç°Î»ÖÃ¾ø¶Ô×ø±ê
+    Vector3f _location;//ï¿½ï¿½Ç°Î»ï¿½Ã¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-    Vector3f _home_uwb;//¼ÒÎ»ÖÃ×ø±ê
+    Vector3f _home_uwb;//ï¿½ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-    bool _home_is_set;//¼ÒÎ»ÖÃÊÇ·ñÉèÖÃ
+    bool _home_is_set;//ï¿½ï¿½Î»ï¿½ï¿½ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½
 
-    uint32_t _dis_ab;//²Î¿¼µãab¼ä¾à
+    uint32_t _dis_ab;//ï¿½Î¿ï¿½ï¿½ï¿½abï¿½ï¿½ï¿½
     uint32_t _dis_ac;//ac
     uint32_t _dis_bc;//bc
 
-    bool _dis_EN;//×ø±êÏµÒÑ½¨Á¢
+    bool _dis_EN;//ï¿½ï¿½ï¿½ï¿½Ïµï¿½Ñ½ï¿½ï¿½ï¿½
 
-    int _dis_EN_step;//×ø±êÏµ½¨Á¢²½Öè
+    int _dis_EN_step;//ï¿½ï¿½ï¿½ï¿½Ïµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
 
 
-    //¾àÀë¼ÆËã
+    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     bool distance_calculate(uint8_t* data, int baseSta);
 
-    //Î»ÖÃ¾àÀë¼ÆËã
+    //Î»ï¿½Ã¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     bool location_calculate(uint8_t* data);
 
     // bool update_uwb_loc() { return  uwb_loc.loc_pos(_dis_na_cm, _dis_nb_cm, _dis_nc_cm); }
